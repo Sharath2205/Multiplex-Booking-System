@@ -27,6 +27,7 @@ public class UserService implements IUserService {
 
 	@Transactional(readOnly = false)
 	public User createUser(User user) {
+		user.setUserType('U');
 		Optional<User> optionalUser = userRepository.findByEmailIdIgnoreCase(user.getEmailId());
 
 		if (optionalUser.isPresent()) {
@@ -97,15 +98,15 @@ public class UserService implements IUserService {
 
 	@Transactional(readOnly = true)
 	public User getUserByName(String name) {
-		if(name == null) {
-		Optional<User> optionalUser = userRepository.findByUserName(name);
-		if (optionalUser.isPresent())
-			return optionalUser.get();
-		throw new UserNotFoundException("User with user name \"" + name + "\" doesnot exist");
+		if (name == null) {
+			Optional<User> optionalUser = userRepository.findByUserName(name);
+			if (optionalUser.isPresent())
+				return optionalUser.get();
+			throw new UserNotFoundException(AppConstants.USER_NAME_NOT_FOUND.replace("#", name));
 		}
 		throw new InsufficentInformationException(AppConstants.INSUFFICENT_INFORMATION);
 	}
-	
+
 	@Transactional(readOnly = false)
 	public String deleteUser(UserDto userDto) {
 		if (userDto.getEmailId() != null && userDto.getPassword() != null) {

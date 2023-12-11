@@ -18,7 +18,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "booking")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "hallId")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "bookingId")
 public class Booking {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

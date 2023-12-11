@@ -16,6 +16,7 @@ public class AppConstants {
 	public static final String INVALID_MOBILE_NUMBER = "Enter a valid 10 digit mobile number.";
 	public static final String INVALID_CREDENTIALS = "Invalid email or password. Please double-check your credentials and try again";
 	public static final String USER_NOT_FOUND = "User with email # not found";
+	public static final String USER_NAME_NOT_FOUND = "User with user name \"#\" not found";
 	public static final String SAME_OLD_AND_NEW_PASSWORD = "Old password and new password should not be same";
 	public static final String PASSWORD_MISMATCH = "New password and confirm password does not match";
 	public static final String ENTER_NEW_AND_CONFIRM_PASSWORD = "Please enter both new password and confirm password";
