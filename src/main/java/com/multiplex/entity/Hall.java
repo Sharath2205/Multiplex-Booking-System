@@ -30,7 +30,7 @@ public class Hall {
 	private List<HallCapacity> hallCapacities;
 	
 	@OneToMany(mappedBy = "hall", cascade = CascadeType.REMOVE)
-	private List<Shows> shows;
+	private List<Show> shows;
 
 	public Hall() {
 		super();
@@ -43,7 +43,7 @@ public class Hall {
 		this.totalCapacity = totalCapacity;
 	}
 	
-	public Hall(int hallId, String hallDesc, int totalCapacity, List<HallCapacity> hallCapacities, List<Shows> shows) {
+	public Hall(int hallId, String hallDesc, int totalCapacity, List<HallCapacity> hallCapacities, List<Show> shows) {
 		super();
 		this.hallId = hallId;
 		this.hallDesc = hallDesc;
@@ -85,11 +85,11 @@ public class Hall {
 		this.hallCapacities = hallCapacities;
 	}
 
-	public List<Shows> getShows() {
+	public List<Show> getShows() {
 		return shows;
 	}
 
-	public void setShows(List<Shows> shows) {
+	public void setShows(List<Show> shows) {
 		this.shows = shows;
 	}
 

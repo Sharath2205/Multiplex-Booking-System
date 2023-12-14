@@ -21,28 +21,41 @@ public class Movies {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "movie_id")
 	private int movieId;
-	
+
 	@Column(name = "movie_name", length = 255)
 	private String movieName;
+
+	@Column(name = "genre", length = 30)
+	private String genre;
 	
 	@OneToMany(mappedBy = "movie", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-	private List<Shows> shows;
+	private List<Show> shows;
 
 	public Movies() {
 		super();
 	}
 
-	public Movies(int movieId, String movieName) {
+	public Movies(int movieId, String movieName, String genre) {
 		super();
 		this.movieId = movieId;
 		this.movieName = movieName;
+		this.genre = genre;
 	}
 
-	public Movies(int movieId, String movieName, List<Shows> shows) {
+	public Movies(int movieId, String movieName, String genre, List<Show> shows) {
 		super();
 		this.movieId = movieId;
+		this.genre = genre;
 		this.movieName = movieName;
 		this.shows = shows;
+	}
+
+	public String getGenre() {
+		return genre;
+	}
+
+	public void setGenre(String genre) {
+		this.genre = genre;
 	}
 
 	public int getMovieId() {
@@ -61,11 +74,11 @@ public class Movies {
 		this.movieName = movieName;
 	}
 
-	public List<Shows> getShows() {
+	public List<Show> getShows() {
 		return shows;
 	}
 
-	public void setShows(List<Shows> shows) {
+	public void setShows(List<Show> shows) {
 		this.shows = shows;
 	}
 

@@ -1,5 +1,6 @@
 package com.multiplex.serviceimpl;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,8 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.multiplex.dto.UserDto;
+import com.multiplex.dto.UserLoginDto;
+import com.multiplex.dto.UserPasswordResetDto;
 import com.multiplex.entity.User;
 import com.multiplex.exception.InsufficentInformationException;
+import com.multiplex.exception.InvalidDateOfBirthException;
 import com.multiplex.exception.InvalidEmailException;
 import com.multiplex.exception.InvalidPasswordException;
 import com.multiplex.exception.PasswordMismatchException;
@@ -26,41 +30,58 @@ public class UserService implements IUserService {
 	UserRepository userRepository;
 
 	@Transactional(readOnly = false)
-	public User createUser(User user) {
-		user.setUserType('U');
-		Optional<User> optionalUser = userRepository.findByEmailIdIgnoreCase(user.getEmailId());
+	public UserDto registerUser(UserDto userDto) {
+		System.out.println(userDto.getConfirmPassword());
+		Optional<User> optionalUser = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId());
 
 		if (optionalUser.isPresent()) {
 			throw new UserCreationException(AppConstants.USER_ALREADY_EXISTS);
 		} else {
-			if (user.getUserName() == null || !user.getUserName().matches(AppConstants.USER_NAME_REGEX)) {
+
+			if (userDto.getUserName() == null || !userDto.getUserName().matches(AppConstants.USER_NAME_REGEX)) {
 				throw new UserCreationException(AppConstants.INVALID_USER_NAME);
 			}
-			if (user.getPassword() == null || !user.getPassword().matches(AppConstants.PASSWORD_REGEX)) {
+			if (userDto.getPassword() == null || !userDto.getPassword().matches(AppConstants.PASSWORD_REGEX)) {
 				throw new InvalidPasswordException(AppConstants.INVALID_PASSWORD);
+			} else if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
+				throw new PasswordMismatchException(AppConstants.PASSWORD_MISMATCH);
 			}
-			if (user.getEmailId() == null || !user.getEmailId().matches(AppConstants.EMAIL_REGEX)) {
+			if (userDto.getEmailId() == null || !userDto.getEmailId().matches(AppConstants.EMAIL_REGEX)) {
 				throw new InvalidEmailException(AppConstants.INVALID_EMAIL);
 			}
-			if (!(Long.toString(user.getMobileNumber()).matches(AppConstants.MOBILE_NUMBER_REGEX))) {
+			if (!(Long.toString(userDto.getMobileNumber()).matches(AppConstants.MOBILE_NUMBER_REGEX))) {
 				throw new UserCreationException(AppConstants.INVALID_MOBILE_NUMBER);
 			}
+			if(!userDto.getDateOfBirth().isBefore(LocalDate.now())) {
+				throw new InvalidDateOfBirthException(AppConstants.INVALID_DATE_OF_BIRTH);
+			}
 		}
-		return userRepository.save(user);
+		User user = new User();
+		user.setUserName(userDto.getUserName());
+		user.setEmailId(userDto.getEmailId());
+		user.setMobileNumber(userDto.getMobileNumber());
+		user.setDateOfBirth(userDto.getDateOfBirth());
+		user.setPassword(userDto.getPassword());
+		user = userRepository.save(user);
+		userDto.setUserId(user.getUserId());
+		return userDto;
 	}
 
 	@Transactional(readOnly = true)
-	public String loginUser(User user) {
-		Optional<User> registeredUser = userRepository.findByEmailIdIgnoreCase(user.getEmailId());
+	public String loginUser(UserLoginDto userDto) {
+		Optional<User> registeredUser = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId());
 
-		if (registeredUser.isPresent() && (registeredUser.get().getPassword().equals(user.getPassword()))) {
-			return "Logged in successfully. Welcome " + registeredUser.get().getUserName();
+		if (registeredUser.isPresent()) {
+			if (registeredUser.get().getPassword().equals(userDto.getPassword())) {
+				return "Logged in successfully. Welcome " + registeredUser.get().getUserName();
+			}
+			throw new InvalidEmailException(AppConstants.INVALID_CREDENTIALS);
 		}
-		throw new InvalidEmailException(AppConstants.INVALID_CREDENTIALS);
+		throw new UserNotFoundException(AppConstants.USER_NOT_FOUND.replace("#", userDto.getEmailId()));
 	}
 
 	@Transactional(readOnly = false)
-	public String resetPassword(UserDto userDto) {
+	public String resetPassword(UserPasswordResetDto userDto) {
 		if (userDto.getEmailId() != null) {
 			Optional<User> user = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId().toLowerCase());
 			if (user.isPresent()) {
@@ -108,7 +129,7 @@ public class UserService implements IUserService {
 	}
 
 	@Transactional(readOnly = false)
-	public String deleteUser(UserDto userDto) {
+	public String deleteUser(UserLoginDto userDto) {
 		if (userDto.getEmailId() != null && userDto.getPassword() != null) {
 			Optional<User> optionalUser = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId().toLowerCase());
 			if (optionalUser.isPresent()) {
@@ -125,7 +146,31 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public String updateUser(User user) {
-		return null;
+	public User updateUser(UserDto user) {
+		if (user.getEmailId() != null) {
+			Optional<User> optionalUser = userRepository.findByEmailIdIgnoreCase(user.getEmailId());
+			if (optionalUser.isPresent()) {
+				User dbUser = optionalUser.get();
+
+				if (user.getUserName() != null && user.getUserName().matches(AppConstants.USER_NAME_REGEX)) {
+					dbUser.setUserName(user.getUserName());
+				} else if (user.getUserName() != null && !user.getUserName().matches(AppConstants.USER_NAME_REGEX)) {
+					throw new UserCreationException(AppConstants.INVALID_USER_NAME);
+				}
+
+				if (user.getMobileNumber() != 0
+						&& (Long.toString(user.getMobileNumber()).matches(AppConstants.MOBILE_NUMBER_REGEX))) {
+					dbUser.setMobileNumber(user.getMobileNumber());
+				} else if (user.getMobileNumber() != 0
+						&& !Long.toString(user.getMobileNumber()).matches(AppConstants.MOBILE_NUMBER_REGEX)) {
+					throw new UserCreationException(AppConstants.INVALID_MOBILE_NUMBER);
+				}
+
+				dbUser = userRepository.save(dbUser);
+				
+			}
+			throw new UserNotFoundException(AppConstants.USER_NOT_FOUND.replace("#", user.getEmailId()));
+		}
+		throw new InsufficentInformationException(AppConstants.INSUFFICENT_INFORMATION);
 	}
 }

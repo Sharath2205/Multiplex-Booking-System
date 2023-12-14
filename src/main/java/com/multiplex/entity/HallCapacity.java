@@ -1,5 +1,7 @@
 package com.multiplex.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.multiplex.embedded.HallCapacityId;
 
 import jakarta.persistence.CascadeType;
@@ -15,20 +17,25 @@ import lombok.Data;
 @Data
 public class HallCapacity {
 	@EmbeddedId
+	@JsonIgnore
 	private HallCapacityId hallCapacityId;
 	
 	@ManyToOne	
 	@MapsId("hallId")
 	@JoinColumn(name = "hall_id")
+	@JsonIdentityReference(alwaysAsId = true)
 	private Hall hall;
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@MapsId("seatTypeId")
 	@JoinColumn(name = "seat_type_id")
+	@JsonIdentityReference(alwaysAsId = true)
 	private SeatType seatType;
 	
 	@Column(name = "seat_count")
 	private int seatCount;
+	
+	
 
 	public HallCapacityId getHallCapacityId() {
 		return hallCapacityId;
@@ -65,6 +72,13 @@ public class HallCapacity {
 	public HallCapacity(HallCapacityId hallCapacityId, Hall hall, SeatType seatType, int seatCount) {
 		super();
 		this.hallCapacityId = hallCapacityId;
+		this.hall = hall;
+		this.seatType = seatType;
+		this.seatCount = seatCount;
+	}
+
+	public HallCapacity(Hall hall, SeatType seatType, int seatCount) {
+		super();
 		this.hall = hall;
 		this.seatType = seatType;
 		this.seatCount = seatCount;

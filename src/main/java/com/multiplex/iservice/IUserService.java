@@ -5,20 +5,22 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.multiplex.dto.UserDto;
+import com.multiplex.dto.UserLoginDto;
+import com.multiplex.dto.UserPasswordResetDto;
 import com.multiplex.entity.User;
 
 @Service
 public interface IUserService {
 	
-	User createUser(User user);
+	UserDto registerUser(UserDto userDto);
 	
-	String loginUser(User user);
+	String loginUser(UserLoginDto user);
 	
 	List<User> getAllUsers();
 	
-	String updateUser(User user);
+	String deleteUser(UserLoginDto user);
 	
-	String deleteUser(UserDto user);
-	
-	String resetPassword(UserDto user);
+	String resetPassword(UserPasswordResetDto user);
+
+	User updateUser(UserDto user);
 }

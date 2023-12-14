@@ -2,54 +2,48 @@ package com.multiplex.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 public class HallDto {
+	@JsonProperty(access = Access.READ_ONLY)
+	private int hallId;
+	private String hallDesc;
+	private List<SeatTypeDto> seatTypes;
 
-    private String hallDesc;
-    private int totalCapacity;
-    private List<Integer> seatTypeIds;
-    private List<Integer> seatCounts;
-
-    public HallDto() {
-    }
-
-    public HallDto(String hallDesc, int totalCapaacity, List<Integer> seatTypeIds, List<Integer> seatCounts) {
-        this.hallDesc = hallDesc;
-        this.totalCapacity = totalCapaacity;
-        this.seatTypeIds = seatTypeIds;
-        this.seatCounts = seatCounts;
-    }
-    
-    
-
-    public int getTotalCapacity() {
-		return totalCapacity;
+	public HallDto() {
+		super();
 	}
 
-	public void setTotalCapacity(int totalCapacity) {
-		this.totalCapacity = totalCapacity;
+	public HallDto(int hallId, String hallDesc, List<SeatTypeDto> seatTypes) {
+		super();
+		this.hallId = hallId;
+		this.hallDesc = hallDesc;
+		this.seatTypes = seatTypes;
+	}
+
+	public int getHallId() {
+		return hallId;
+	}
+
+	public void setHallId(int hallId) {
+		this.hallId = hallId;
 	}
 
 	public String getHallDesc() {
-        return hallDesc;
-    }
+		return hallDesc;
+	}
 
-    public void setHallDesc(String hallDesc) {
-        this.hallDesc = hallDesc;
-    }
+	public void setHallDesc(String hallDesc) {
+		this.hallDesc = hallDesc;
+	}
 
-    public List<Integer> getSeatTypeIds() {
-        return seatTypeIds;
-    }
+	public List<SeatTypeDto> getSeatTypes() {
+		return seatTypes;
+	}
 
-    public void setSeatTypeIds(List<Integer> seatTypeIds) {
-        this.seatTypeIds = seatTypeIds;
-    }
+	public void setSeatTypes(List<SeatTypeDto> seatTypes) {
+		this.seatTypes = seatTypes;
+	}
 
-    public List<Integer> getSeatCounts() {
-        return seatCounts;
-    }
-
-    public void setSeatCounts(List<Integer> seatCounts) {
-        this.seatCounts = seatCounts;
-    }
 }

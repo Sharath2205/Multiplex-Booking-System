@@ -16,11 +16,14 @@ public class AppConstants {
 	public static final String INVALID_MOBILE_NUMBER = "Enter a valid 10 digit mobile number.";
 	public static final String INVALID_CREDENTIALS = "Invalid email or password. Please double-check your credentials and try again";
 	public static final String USER_NOT_FOUND = "User with email # not found";
+	public static final String USER_NOT_REGISTERED = "Please register yourself to book tickets";
 	public static final String USER_NAME_NOT_FOUND = "User with user name \"#\" not found";
 	public static final String SAME_OLD_AND_NEW_PASSWORD = "Old password and new password should not be same";
 	public static final String PASSWORD_MISMATCH = "New password and confirm password does not match";
 	public static final String ENTER_NEW_AND_CONFIRM_PASSWORD = "Please enter both new password and confirm password";
 	public static final String INSUFFICENT_INFORMATION = "Please provide all the required information";
+	public static final String ADMIN_NOT_FOUND = "Invalid admin credentials";
+	public static final String INVALID_DATE_OF_BIRTH = "Please enter valid date of birth";
 	
 	// ---------------- MOVIE EXCEPTION MESSAGES -----------------
 	public static final String MOVIE_NOT_FOUND = " not found";
@@ -28,6 +31,19 @@ public class AppConstants {
 	
 	// ---------------- SHOW EXCEPTION MESSAGES ------------------
 	public static final String SHOWS_NOT_FOUND = "No Shows available for movie \"#\"";
+	public static final String SHOW_ID_NOT_FOUND = "No show found with id: ";
+	public static final String INVALID_SLOT_NUMBER = "Slot number should be between 1 and 4";
+	public static final String SHOW_ALREADY_RUNNING = "A show is already running in the hall 1 with in 2 slot till 3";
+	public static final String NO_SHOW_RUNNING = "Show is not available on the selected Date: date";
+	
+	// ---------------- HALL EXCEPTION MESSAGES ------------------
+	public static final String HALL_DESC_NOT_FOUND = "Please provide a valid Hall";
+	public static final String HALL_WITH_DESC_ALREADY_EXISTS = "Hall with name # already exists";
+	public static final String NO_HALLS_FOUND = "No Halls available at this moment";
+	public static final String HALL_WITH_ID_NOT_FOUND = "Hall with ID # not found";
+	
+	// ---------------- BOOKING EXCEPTION MESSAGES
+	public static final String NO_SEAT_TYPE = "Please select any seat to book a ticket";
 	
 	private AppConstants() {}
 }

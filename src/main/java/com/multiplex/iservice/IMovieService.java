@@ -1,8 +1,8 @@
 package com.multiplex.iservice;
 
-import com.multiplex.entity.Movies;
+import com.multiplex.dto.PublishMovieDto;
 
 public interface IMovieService {
 	
-	boolean addMovie(Movies movie);
+	String addMovie(PublishMovieDto movie);
 }

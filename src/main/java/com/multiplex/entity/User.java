@@ -1,5 +1,6 @@
 package com.multiplex.entity;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -29,13 +30,16 @@ public class User {
 	private String password;
 	
 	@Column(name = "user_type", nullable = false)
-	private char userType;
+	private char userType = 'U';
 	
 	@Column(name = "mobile_no", length = 10, nullable = false)
 	private long mobileNumber;
 	
 	@Column(name = "email_id", length = 225, unique = true)
 	private String emailId;
+	
+	@Column(name = "date_of_birth")
+	private LocalDate dateOfBirth;
 	
 	@OneToMany(mappedBy = "user")
 	private List<Booking> booking;
@@ -44,15 +48,16 @@ public class User {
 		
 	}
 
-	public User(int userId, String userName, char userType, String userPassword, long mobileNumber, String emailId,
-			List<Booking> booking) {
+	public User(int userId, String userName, String password, char userType, long mobileNumber, String emailId,
+			LocalDate dateOfBirth, List<Booking> booking) {
 		super();
 		this.userId = userId;
 		this.userName = userName;
+		this.password = password;
 		this.userType = userType;
-		this.password = userPassword;
 		this.mobileNumber = mobileNumber;
 		this.emailId = emailId;
+		this.dateOfBirth = dateOfBirth;
 		this.booking = booking;
 	}
 
@@ -104,6 +109,14 @@ public class User {
 		this.emailId = emailId;
 	}
 
+	public LocalDate getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(LocalDate dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
+
 	public List<Booking> getBooking() {
 		return booking;
 	}
@@ -112,9 +125,4 @@ public class User {
 		this.booking = booking;
 	}
 
-	@Override
-	public String toString() {
-		return "User [userId=" + userId + ", userName=" + userName + ", userPassword=" + password + ", userType="
-				+ userType + ", mobileNumber=" + mobileNumber + ", emailId=" + emailId + ", booking=" + booking + "]";
-	}
 }

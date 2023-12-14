@@ -1,99 +1,107 @@
 package com.multiplex.serviceimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.multiplex.dto.HallDto;
-import com.multiplex.dto.HallWithSeatTypesDTO;
-import com.multiplex.dto.SeatTypeWithCapacityDTO;
+import com.multiplex.dto.HallPublishedDto;
+import com.multiplex.dto.SeatTypeDto;
 import com.multiplex.embedded.HallCapacityId;
 import com.multiplex.entity.Hall;
 import com.multiplex.entity.HallCapacity;
 import com.multiplex.entity.SeatType;
 import com.multiplex.exception.HallAlreadyExistsException;
+import com.multiplex.exception.HallNotFoundException;
 import com.multiplex.iservice.IHallInterface;
 import com.multiplex.repository.HallCapacityRepository;
 import com.multiplex.repository.HallRepository;
 import com.multiplex.repository.SeatTypeRepository;
+import com.multiplex.util.AppConstants;
 
 @Service
 public class HallService implements IHallInterface {
 
 	@Autowired
-	HallRepository hallRepository;
-
-	@Autowired
-	SeatTypeRepository seatTypeRepository;
-
-	@Autowired
 	HallCapacityRepository hallCapacityRepository;
 
-	public Hall addHallWithSeatTypes(HallDto hallDto) {
-		Optional<Hall> existingHall = hallRepository.findByHallDescIgnoreCase(hallDto.getHallDesc());
-		if (existingHall.isEmpty()) {
-			List<Integer> seatTypeIds = hallDto.getSeatTypeIds();
-			List<Integer> seatCounts = hallDto.getSeatCounts();
-			Hall hall = new Hall();
-			hall.setHallDesc(hallDto.getHallDesc());
-			hall.setTotalCapacity(hallDto.getTotalCapacity());
+	@Autowired
+	private HallRepository hallRepository;
 
-			hall = hallRepository.save(hall);
+	@Autowired
+	private SeatTypeRepository seatTypeRepository;
 
-			for (int i = 0; i < seatTypeIds.size(); i++) {
-				SeatType seatType = seatTypeRepository.findById(seatTypeIds.get(i)).get();
+	public HallPublishedDto addHallWithSeatTypes(HallDto hallDto) {
+		if (hallDto.getHallDesc() != null && !hallDto.getHallDesc().isBlank()) {
+			Optional<Hall> existingHall = hallRepository.findByHallDescIgnoreCase(hallDto.getHallDesc());
+			if (existingHall.isEmpty()) {
+				Hall hall = new Hall();
+				hall.setHallDesc(hallDto.getHallDesc());
+				hall.setTotalCapacity(hallDto.getSeatTypes().stream().mapToInt(i -> i.getSeatCount()).sum());
 
-				HallCapacity hallCapacity = new HallCapacity();
-				HallCapacityId hallCapacityId = new HallCapacityId();
-				hallCapacityId.setHallId(hall.getHallId());
-				hallCapacityId.setSeatTypeId(seatType.getSeatTypeId());
+				hall = hallRepository.save(hall);
 
-				hallCapacity.setHallCapacityId(hallCapacityId);
-				hallCapacity.setHall(hall);
-				hallCapacity.setSeatType(seatType);
-				hallCapacity.setSeatCount(seatCounts.get(i));
+				List<HallCapacity> hallCapacities = new ArrayList<>();
 
-				hallCapacityRepository.save(hallCapacity);
+				for (SeatTypeDto seatTypeDto : hallDto.getSeatTypes()) {
+					SeatType existingSeatType = seatTypeRepository
+							.findBySeatTypeDescIgnoreCase(seatTypeDto.getSeatTypeDesc());
+
+					if (existingSeatType == null) {
+						SeatType newSeatType = new SeatType();
+						newSeatType.setSeatTypeDesc(seatTypeDto.getSeatTypeDesc());
+						newSeatType.setSeatFare(seatTypeDto.getSeatFare());
+						seatTypeRepository.save(newSeatType);
+
+						existingSeatType = newSeatType;
+					}
+
+					HallCapacityId hallCapacityId = new HallCapacityId(hall.getHallId(),
+							existingSeatType.getSeatTypeId());
+					HallCapacity existingHallCapacity = hallCapacityRepository.findById(hallCapacityId).orElse(null);
+
+					if (existingHallCapacity == null) {
+						HallCapacity hallCapacity = new HallCapacity(hallCapacityId, hall, existingSeatType,
+								seatTypeDto.getSeatCount());
+						hallCapacityRepository.save(hallCapacity);
+						hallCapacities.add(hallCapacity);
+					} else {
+						existingHallCapacity.setSeatCount(seatTypeDto.getSeatCount());
+						hallCapacities.add(existingHallCapacity);
+					}
+				}
+
+				hall.setHallCapacities(hallCapacities);
+				hall = hallRepository.save(hall);
+				
+				return new HallPublishedDto(hall.getHallId(), hall.getHallDesc(), hall.getTotalCapacity(), hall.getHallCapacities());
 			}
-
-			hall.setHallCapacities(hallCapacityRepository.findByHall(hall));
-
-			return hall;
+			throw new HallAlreadyExistsException(
+					AppConstants.HALL_WITH_DESC_ALREADY_EXISTS.replace("#", hallDto.getHallDesc()));
 		}
-		throw new HallAlreadyExistsException("Hall " + hallDto.getHallDesc() + " already exists");
+		throw new HallNotFoundException(AppConstants.HALL_DESC_NOT_FOUND);
 	}
-	
-	 @Transactional
-	    public HallWithSeatTypesDTO getHallWithSeatTypes(int hallId) {
-	        Hall hall = hallRepository.findById(hallId).orElse(null);
 
-	        if (hall != null) {
-	            List<HallCapacity> hallCapacities = hallCapacityRepository.findByHall(hall);
-	            List<SeatTypeWithCapacityDTO> seatTypes = hallCapacities.stream()
-	                    .map(this::convertToSeatTypeWithCapacityDTO)
-	                    .toList();
+	public List<Hall> getAllHalls() {
+		List<Hall> allHalls = hallRepository.findAll();
+		if (allHalls.isEmpty())
+			throw new HallNotFoundException(AppConstants.NO_HALLS_FOUND);
+		return allHalls;
+	}
 
-	            HallWithSeatTypesDTO hallWithSeatTypesDTO = new HallWithSeatTypesDTO();
-	            hallWithSeatTypesDTO.setHallId(hall.getHallId());
-	            hallWithSeatTypesDTO.setHallDesc(hall.getHallDesc());
-	            hallWithSeatTypesDTO.setTotalCapacity(hall.getTotalCapacity());
-	            hallWithSeatTypesDTO.setSeatTypes(seatTypes);
+	public Hall getHallById(int hallId) {
+		return hallRepository.findById(hallId).orElseThrow(() -> new HallNotFoundException(
+				AppConstants.HALL_WITH_ID_NOT_FOUND.replace("#", Integer.toString(hallId))));
+	}
 
-	            return hallWithSeatTypesDTO;
-	        }
-
-	        return null;
-	    }
-
-	    private SeatTypeWithCapacityDTO convertToSeatTypeWithCapacityDTO(HallCapacity hallCapacity) {
-	        SeatTypeWithCapacityDTO seatTypeDTO = new SeatTypeWithCapacityDTO();
-	        seatTypeDTO.setSeatTypeId(hallCapacity.getSeatType().getSeatTypeId());
-	        seatTypeDTO.setSeatTypeDesc(hallCapacity.getSeatType().getSeatTypeDesc());
-	        seatTypeDTO.setSeatFare(hallCapacity.getSeatType().getSeatFare());
-	        seatTypeDTO.setSeatCount(hallCapacity.getSeatCount());
-	        return seatTypeDTO;
-	    }
+	public boolean deleteHallById(int hallId) {
+		if (hallRepository.findById(hallId).isEmpty())
+			throw new HallNotFoundException(AppConstants.HALL_WITH_ID_NOT_FOUND.replace("#", Integer.toString(hallId)));
+		long count = hallRepository.count();
+		hallRepository.deleteById(hallId);
+		return count > hallRepository.count();
+	}
 }

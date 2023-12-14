@@ -3,6 +3,7 @@ package com.multiplex.embedded;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.multiplex.entity.Hall;
 import com.multiplex.entity.SeatType;
 
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 @Embeddable
 @SuppressWarnings("unused")
+@JsonIdentityReference(alwaysAsId = true)
 public class HallCapacityId implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int hallId;

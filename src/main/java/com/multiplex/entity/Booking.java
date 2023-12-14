@@ -1,9 +1,11 @@
 package com.multiplex.entity;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.Column;
@@ -15,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "booking")
@@ -26,18 +29,36 @@ public class Booking {
 	private int bookingId;
 
 	@Column(name = "booked_date")
-	private Date bookedDate;
+	private LocalDateTime bookedDate;
 
 	@Column(name = "show_date")
-	private Date showDate;
+	private LocalDate showDate;
 
 	@ManyToOne
 	@JoinColumn(name = "show_id")
-	private Shows shows;
+	@JsonManagedReference(value = "show_id")
+	private Show shows;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
+	
+	@OneToMany(mappedBy = "booking")
+	private List<BookingDetails> bookingDetails;
+
+	public Booking() {
+	}
+
+	public Booking(int bookingId, LocalDateTime bookedDate, LocalDate showDate, Show shows, User user,
+			List<BookingDetails> bookingDetails) {
+		super();
+		this.bookingId = bookingId;
+		this.bookedDate = bookedDate;
+		this.showDate = showDate;
+		this.shows = shows;
+		this.user = user;
+		this.bookingDetails = bookingDetails;
+	}
 
 	public int getBookingId() {
 		return bookingId;
@@ -47,27 +68,27 @@ public class Booking {
 		this.bookingId = bookingId;
 	}
 
-	public Date getBookedDate() {
+	public LocalDateTime getBookedDate() {
 		return bookedDate;
 	}
 
-	public void setBookedDate(Date bookedDate) {
+	public void setBookedDate(LocalDateTime bookedDate) {
 		this.bookedDate = bookedDate;
 	}
 
-	public Date getShowDate() {
+	public LocalDate getShowDate() {
 		return showDate;
 	}
 
-	public void setShowDate(Date showDate) {
+	public void setShowDate(LocalDate showDate) {
 		this.showDate = showDate;
 	}
 
-	public Shows getShows() {
+	public Show getShows() {
 		return shows;
 	}
 
-	public void setShows(Shows shows) {
+	public void setShows(Show shows) {
 		this.shows = shows;
 	}
 
@@ -86,24 +107,32 @@ public class Booking {
 	public void setBookingDetails(List<BookingDetails> bookingDetails) {
 		this.bookingDetails = bookingDetails;
 	}
+	
+	@Transient
+    public String getMovieName() {
+        return shows.getMovie().getMovieName();
+    }
+
+    @Transient
+    public String getHallDesc() {
+        return shows.getHall().getHallDesc();
+    }
+
+    @Transient
+    public int getSlotNo() {
+        return shows.getSlotNo();
+    }
+
+    @Transient
+    public LocalDate getBookingDate() {
+        return shows.getFromDate();
+    }
 
 	@Override
 	public String toString() {
 		return "Booking [bookingId=" + bookingId + ", bookedDate=" + bookedDate + ", showDate=" + showDate + ", shows="
-				+ shows + ", user=" + user + ", bookingDetails=" + bookingDetails + "]";
+				+ shows.getShowId() + ", user=" + user.getEmailId() + ", bookingDetails=" + bookingDetails.isEmpty() + "]";
 	}
 
-	public Booking(int bookingId, Date bookedDate, Date showDate, Shows shows, User user,
-			List<BookingDetails> bookingDetails) {
-		super();
-		this.bookingId = bookingId;
-		this.bookedDate = bookedDate;
-		this.showDate = showDate;
-		this.shows = shows;
-		this.user = user;
-		this.bookingDetails = bookingDetails;
-	}
 
-	@OneToMany(mappedBy = "booking")
-	private List<BookingDetails> bookingDetails;
 }

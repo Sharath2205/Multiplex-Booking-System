@@ -14,16 +14,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.multiplex.dto.HallDto;
-import com.multiplex.dto.HallWithSeatTypesDTO;
+import com.multiplex.dto.HallPublishedDto;
+import com.multiplex.dto.PublishMovieDto;
+import com.multiplex.dto.PublishShowDto;
+import com.multiplex.dto.ShowDto;
 import com.multiplex.entity.Hall;
-import com.multiplex.entity.Shows;
+import com.multiplex.entity.Show;
 import com.multiplex.entity.User;
 import com.multiplex.serviceimpl.HallService;
+import com.multiplex.serviceimpl.MovieService;
 import com.multiplex.serviceimpl.ShowsService;
 import com.multiplex.serviceimpl.UserService;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/v1/admin")
 public class AdminController {
 
 	@Autowired
@@ -34,6 +38,9 @@ public class AdminController {
 
 	@Autowired
 	HallService hallService;
+	
+	@Autowired
+	MovieService movieService;
 
 	@GetMapping("/getAllUsers")
 	public ResponseEntity<List<User>> getAllUsers() {
@@ -42,39 +49,36 @@ public class AdminController {
 				HttpStatus.OK);
 	}
 
-	@GetMapping("/getUserByUserName/{userName}")
-	public ResponseEntity<User> getUserByUserName(@PathVariable String userName) {
-		return new ResponseEntity<>(userService.getUserByName(userName), HttpStatus.OK);
-	}
-
-	@PostMapping(value = "/addShow", consumes = "application/json")
-	public ResponseEntity<String> addShow(@RequestBody Shows show) {
+	@PostMapping(value = "/publishshow", consumes = "application/json")
+	public ResponseEntity<String> addShow(@RequestBody PublishShowDto show) {
 		if (showsService.addShow(show)) {
 			return new ResponseEntity<>("Show added successfully", HttpStatus.OK);
-		} else
-			return new ResponseEntity<>("Oops, Please try again!", HttpStatus.UNPROCESSABLE_ENTITY);
+		} else	
+			return new ResponseEntity<>("Oops, Please try again!", HttpStatus.BAD_REQUEST);
 	}
 
-	@DeleteMapping(value = "/removeShow/{showId}")
+	@DeleteMapping(value = "/removeshow/{showId}")
 	public ResponseEntity<String> deleteShow(@PathVariable int showId) {
-		showsService.deleteShowById(showId);
-		return new ResponseEntity<>("Show deleted successfully", HttpStatus.OK);
-	}
-
-	@PostMapping("/add")
-	public ResponseEntity<Hall> addHall(@RequestBody HallDto hall) {
-		Hall addedHall = hallService.addHallWithSeatTypes(hall);
-		return new ResponseEntity<>(addedHall, HttpStatus.CREATED);
+		return showsService.deleteShowById(showId) ? new ResponseEntity<>("Show deleted successfully", HttpStatus.OK) : new ResponseEntity<>("Show with show id " + showId + " not found!!", HttpStatus.BAD_REQUEST);
 	}
 	
-	@GetMapping("/{hallId}/withSeatTypes")
-    public ResponseEntity<HallWithSeatTypesDTO> getHallWithSeatTypes(@PathVariable int hallId) {
-        HallWithSeatTypesDTO hallWithSeatTypesDTO = hallService.getHallWithSeatTypes(hallId);
-
-        if (hallWithSeatTypesDTO != null) {
-            return ResponseEntity.ok(hallWithSeatTypesDTO);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+	@PostMapping("/publishhall")
+	public ResponseEntity<HallPublishedDto> addHall(@RequestBody HallDto hall) {
+		return new ResponseEntity<>(hallService.addHallWithSeatTypes(hall), HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/hall/{hallId}")
+    public ResponseEntity<Hall> getHallById(@PathVariable int hallId) {
+        return new ResponseEntity<>(hallService.getHallById(hallId), HttpStatus.OK);
+    }
+    
+    @DeleteMapping("/deletehall/{hallId}")
+    public ResponseEntity<Boolean> deleteHallById(@PathVariable int hallId) {
+        return new ResponseEntity<>(hallService.deleteHallById(hallId),HttpStatus.OK);
+    }
+    
+    @PostMapping("/addmovie")
+    public ResponseEntity<String> addMovie(@RequestBody PublishMovieDto publishMovieDto) {
+    	return new ResponseEntity<>(movieService.addMovie(publishMovieDto),HttpStatus.OK);
     }
 }

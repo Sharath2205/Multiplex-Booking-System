@@ -1,5 +1,6 @@
 package com.multiplex.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.multiplex.embedded.BookingDetailsId;
 
 import jakarta.persistence.Column;
@@ -20,12 +21,19 @@ public class BookingDetails {
 	@ManyToOne
     @MapsId("bookingId")
     @JoinColumn(name = "booking_id")
+	@JsonIdentityReference(alwaysAsId = true)
 	private Booking booking;
 	
 	@ManyToOne
     @MapsId("seatTypeId")
     @JoinColumn(name = "seat_type_id")
+	@JsonIdentityReference(alwaysAsId = true)
 	private SeatType seatType;
+	
+
+	public BookingDetails() {
+		super();
+	}
 
 	public BookingDetails(BookingDetailsId id, int noOfSeats, Booking booking, SeatType seatType) {
 		super();

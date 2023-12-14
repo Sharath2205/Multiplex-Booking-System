@@ -3,10 +3,13 @@ package com.multiplex.embedded;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+
 import jakarta.persistence.Embeddable;
 
 @Embeddable
 @SuppressWarnings("serial")
+@JsonIdentityReference(alwaysAsId = true)
 public class BookingDetailsId implements Serializable {
 	private int bookingId;
 	private int seatTypeId;

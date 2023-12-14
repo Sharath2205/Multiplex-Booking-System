@@ -8,9 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.multiplex.dto.MoviesDto;
+import com.multiplex.dto.PublishMovieDto;
 import com.multiplex.dto.UserShowsDto;
 import com.multiplex.entity.Movies;
-import com.multiplex.entity.Shows;
+import com.multiplex.entity.Show;
 import com.multiplex.exception.MovieNotFoundException;
 import com.multiplex.iservice.IMovieService;
 import com.multiplex.repository.MovieRepository;
@@ -22,10 +23,12 @@ public class MovieService implements IMovieService {
 	@Autowired
 	MovieRepository movieRepository;
 
-	public boolean addMovie(Movies movie) {
-		movie.setMovieName(movie.getMovieName().toLowerCase());
-		Movies saved = movieRepository.save(movie);
-		return saved != null;
+	public String addMovie(PublishMovieDto movieDto) {
+		Movies movie = new Movies();
+		movie.setMovieName(movieDto.getMovieName());
+		movie.setGenre(movieDto.getGenre());
+		movie = movieRepository.save(movie);
+		return movie != null ? "Movie added successfully" : "Oops! Try again";
 	}
 
 	public Movies getByMovieId(int movieId) {
@@ -35,9 +38,9 @@ public class MovieService implements IMovieService {
 	public Movies getById(int movieId) {
 		Movies m =  movieRepository.findById(movieId).get();
 		
-		List<Shows> temp = new ArrayList<>();
-		for(Shows s: m.getShows()) {
-			Shows show = new Shows(s.getShowId(), s.getSlotNo(), s.getFromDate(), s.getToDate());
+		List<Show> temp = new ArrayList<>();
+		for(Show s: m.getShows()) {
+			Show show = new Show(s.getShowId(), s.getSlotNo(), s.getFromDate(), s.getToDate());
 			temp.add(show);
 		}
 		m.setShows(temp);
@@ -50,11 +53,11 @@ public class MovieService implements IMovieService {
         	Movies movie = opMovie.get();
         	List<UserShowsDto> shows = new ArrayList<>();
         	
-        	for(Shows show: movie.getShows()) {
+        	for(Show show: movie.getShows()) {
         		shows.add(new UserShowsDto( show.getHall().getHallDesc(), show.getMovie().getMovieName() ,show.getSlotNo(), show.getFromDate(), show.getToDate()));
         	}
         	
-        	return new MoviesDto(movie.getMovieId(), movie.getMovieName(), shows);
+        	return new MoviesDto(movie.getMovieId(), movie.getMovieName(), movie.getGenre(), shows);
         }
         throw new MovieNotFoundException(movieName + AppConstants.MOVIE_NOT_FOUND);
     }

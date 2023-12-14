@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
@@ -14,6 +16,7 @@ import jakarta.persistence.OneToMany;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "seatTypeId")
 public class SeatType {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "seat_type_id")
 	private int seatTypeId;
 	
@@ -29,7 +32,7 @@ public class SeatType {
 	@OneToMany(mappedBy = "seatType")
 	private List<HallCapacity> hallCapacities;
 	
-	
+	 	
 
 	public SeatType() {
 		super();

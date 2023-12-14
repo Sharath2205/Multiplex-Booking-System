@@ -3,7 +3,9 @@ package com.multiplex.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
@@ -18,7 +20,7 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "showId")
-public class Shows {
+public class Show {
 	@Id
 	@Column(name = "show_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,13 +45,14 @@ public class Shows {
 	
 	
 	@OneToMany(mappedBy = "shows")
+	@JsonBackReference(value = "show_id")
 	private List<Booking> booking;
 
-	public Shows() {
+	public Show() {
 		super();
 	}
 
-	public Shows(int showId, int slotNo, LocalDate fromDate, LocalDate toDate) {
+	public Show(int showId, int slotNo, LocalDate fromDate, LocalDate toDate) {
 		super();
 		this.showId = showId;
 //		this.hall = hall;
@@ -58,9 +61,8 @@ public class Shows {
 		this.toDate = toDate;
 	}
 
-	public Shows(int showId, Hall hall, Movies movie, int slotNo, LocalDate fromDate, LocalDate toDate) {
+	public Show(Hall hall, Movies movie, int slotNo, LocalDate fromDate, LocalDate toDate) {
 		super();
-		this.showId = showId;
 		this.hall = hall;
 		this.movie = movie;
 		this.slotNo = slotNo;
