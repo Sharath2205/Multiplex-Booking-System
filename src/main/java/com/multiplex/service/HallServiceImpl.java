@@ -103,4 +103,9 @@ public class HallServiceImpl implements HallService {
 		hallRepository.deleteById(hallId);
 		return count > hallRepository.count();
 	}
+	
+	public Hall getHallByHallDesc(String hallDesc) {
+		return hallRepository.findByHallDescIgnoreCase(hallDesc).orElseThrow(() -> new HallNotFoundException(
+				AppConstants.HALL_DESC_NOT_FOUND));
+	}
 }

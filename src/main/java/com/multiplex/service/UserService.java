@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.multiplex.dto.UserDto;
 import com.multiplex.dto.UserLoginDto;
 import com.multiplex.dto.UserPasswordResetDto;
+import com.multiplex.dto.UserProfileDto;
 import com.multiplex.entity.User;
 
 @Service
@@ -22,5 +23,5 @@ public interface UserService {
 	
 	String resetPassword(UserPasswordResetDto user);
 
-	User updateUser(UserDto user);
+	UserProfileDto updateUser(UserProfileDto user);
 }

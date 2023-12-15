@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.multiplex.dto.UserDto;
 import com.multiplex.dto.UserLoginDto;
 import com.multiplex.dto.UserPasswordResetDto;
+import com.multiplex.dto.UserProfileDto;
 import com.multiplex.entity.User;
 import com.multiplex.exception.InsufficentInformationException;
 import com.multiplex.exception.InvalidDateOfBirthException;
@@ -145,7 +146,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User updateUser(UserDto user) {
+	public UserProfileDto updateUser(UserProfileDto user) {
 		if (user.getEmailId() != null) {
 			Optional<User> optionalUser = userRepository.findByEmailIdIgnoreCase(user.getEmailId());
 			if (optionalUser.isPresent()) {
@@ -166,7 +167,14 @@ public class UserServiceImpl implements UserService {
 				}
 
 				dbUser = userRepository.save(dbUser);
+				UserProfileDto userProfileDto = new UserProfileDto();
+				userProfileDto.setUserId(dbUser.getUserId());
+				userProfileDto.setDateOfBirth(dbUser.getDateOfBirth());
+				userProfileDto.setEmailId(dbUser.getEmailId());
+				userProfileDto.setMobileNumber(dbUser.getMobileNumber());
+				userProfileDto.setUserName(dbUser.getUserName());
 				
+				return userProfileDto;
 			}
 			throw new UserNotFoundException(AppConstants.USER_NOT_FOUND.replace("#", user.getEmailId()));
 		}

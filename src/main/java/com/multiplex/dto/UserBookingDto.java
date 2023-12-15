@@ -4,42 +4,27 @@ import java.time.LocalDate;
 import java.util.Map;
 
 public class UserBookingDto {
-	private String bookingId;
+	private int bookingId;
 	private String userName;
 	private String movieName;
-	private LocalDate bookingDate;
+	private String bookingDate;
 	private String hallDesc;
-	private String slotNo;
+	private int slotNo;
 	private Map<String, Integer> selectedSeats;
 	private LocalDate showDate;
 	private Double bookingTotal;
+	private Double cancellationCharges;
 	private String bookingStatus;
 
 	public UserBookingDto() {
 		super();
 	}
 
-	public UserBookingDto(String bookingId, String userName, String movieName, LocalDate bookingDate, String hallDesc,
-			String slotNo, Map<String, Integer> selectedSeats, LocalDate showDate, Double bookingTotal,
-			String bookingStatus) {
-		super();
-		this.bookingId = bookingId;
-		this.userName = userName;
-		this.movieName = movieName;
-		this.bookingDate = bookingDate;
-		this.hallDesc = hallDesc;
-		this.slotNo = slotNo;
-		this.selectedSeats = selectedSeats;
-		this.showDate = showDate;
-		this.bookingTotal = bookingTotal;
-		this.bookingStatus = bookingStatus;
-	}
-
-	public String getBookingId() {
+	public int getBookingId() {
 		return bookingId;
 	}
 
-	public void setBookingId(String bookingId) {
+	public void setBookingId(int bookingId) {
 		this.bookingId = bookingId;
 	}
 
@@ -59,11 +44,11 @@ public class UserBookingDto {
 		this.movieName = movieName;
 	}
 
-	public LocalDate getBookingDate() {
+	public String getBookingDate() {
 		return bookingDate;
 	}
 
-	public void setBookingDate(LocalDate bookingDate) {
+	public void setBookingDate(String bookingDate) {
 		this.bookingDate = bookingDate;
 	}
 
@@ -75,11 +60,11 @@ public class UserBookingDto {
 		this.hallDesc = hallDesc;
 	}
 
-	public String getSlotNo() {
+	public int getSlotNo() {
 		return slotNo;
 	}
 
-	public void setSlotNo(String slotNo) {
+	public void setSlotNo(int slotNo) {
 		this.slotNo = slotNo;
 	}
 
@@ -115,4 +100,11 @@ public class UserBookingDto {
 		this.bookingStatus = bookingStatus;
 	}
 
+	public Double getCancellationCharges() {
+		return cancellationCharges;
+	}
+
+	public void setCancellationCharges(Double cancellationCharges) {
+		this.cancellationCharges = cancellationCharges;
+	}
 }

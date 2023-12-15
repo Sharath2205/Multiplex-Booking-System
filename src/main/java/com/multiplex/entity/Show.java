@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,26 +26,26 @@ public class Show {
 	@Column(name = "show_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int showId;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "hall_id")
 	private Hall hall;
-	
+
 	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "movie_id")
+	@JsonManagedReference
 	private Movies movie;
-	
+
 	@Column(name = "slot_no")
 	private int slotNo;
-	
+
 	@Column(name = "from_date")
 	private LocalDate fromDate;
-	
+
 	@Column(name = "to_date")
 	private LocalDate toDate;
-	
-	
-	@OneToMany(mappedBy = "shows")
+
+	@OneToMany(mappedBy = "shows", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
 	@JsonBackReference(value = "show_id")
 	private List<Booking> booking;
 
@@ -128,7 +129,6 @@ public class Show {
 
 	@Override
 	public String toString() {
-		return "Shows [showId=" + showId + ", slotNo=" + slotNo + ", fromDate="
-				+ fromDate + ", toDate=" + toDate + "]";
+		return "Shows [showId=" + showId + ", slotNo=" + slotNo + ", fromDate=" + fromDate + ", toDate=" + toDate + "]";
 	}
 }

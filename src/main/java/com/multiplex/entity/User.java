@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,7 +42,7 @@ public class User {
 	@Column(name = "date_of_birth")
 	private LocalDate dateOfBirth;
 	
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	private List<Booking> booking;
 	
 	public User() {
@@ -49,7 +50,7 @@ public class User {
 	}
 
 	public User(int userId, String userName, String password, char userType, long mobileNumber, String emailId,
-			LocalDate dateOfBirth, List<Booking> booking) {
+			LocalDate dateOfBirth) {
 		super();
 		this.userId = userId;
 		this.userName = userName;
@@ -58,7 +59,6 @@ public class User {
 		this.mobileNumber = mobileNumber;
 		this.emailId = emailId;
 		this.dateOfBirth = dateOfBirth;
-		this.booking = booking;
 	}
 
 	public int getUserId() {

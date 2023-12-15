@@ -2,7 +2,23 @@ package com.multiplex.exception;
 
 @SuppressWarnings("serial")
 public class HallNotFoundException extends RuntimeException {
-	public HallNotFoundException(String message) {
-		super(message);
+	private String message;
+
+	public HallNotFoundException() {
 	}
+
+	public HallNotFoundException(String message) {
+		this.message = message;
+	}
+
+	@Override
+	public String getMessage() {
+		return message;
+	}
+
+	@Override
+	public String toString() {
+		return "BookingException : " + message;
+	}
+
 }

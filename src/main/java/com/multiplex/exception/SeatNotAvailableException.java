@@ -2,7 +2,23 @@ package com.multiplex.exception;
 
 @SuppressWarnings("serial")
 public class SeatNotAvailableException extends RuntimeException {
-	public SeatNotAvailableException(String message) {
-		super(message);
+	private String message;
+
+	public SeatNotAvailableException() {
 	}
+
+	public SeatNotAvailableException(String message) {
+		this.message = message;
+	}
+
+	@Override
+	public String getMessage() {
+		return message;
+	}
+
+	@Override
+	public String toString() {
+		return "BookingException : " + message;
+	}
+
 }

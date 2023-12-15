@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.multiplex.dto.BookingDto;
 import com.multiplex.dto.CancelDto;
+import com.multiplex.dto.UserBookingDto;
 import com.multiplex.dto.UserDto;
 import com.multiplex.dto.UserLoginDto;
 import com.multiplex.dto.UserPasswordResetDto;
-import com.multiplex.entity.Booking;
-import com.multiplex.entity.User;
+import com.multiplex.dto.UserProfileDto;
 import com.multiplex.service.BookingServiceImpl;
 import com.multiplex.service.UserServiceImpl;
 
@@ -46,8 +46,8 @@ public class UserController {
 	}
 
 	@PutMapping(value = "/editprofile", consumes = "application/json")
-	public ResponseEntity<User> updateUserByMobile(@RequestBody UserDto userDto) {
-		
+	public ResponseEntity<UserProfileDto> updateUserByMobile(@RequestBody UserProfileDto userDto) {
+
 		return new ResponseEntity<>(userService.updateUser(userDto), HttpStatus.OK);
 	}
 
@@ -57,18 +57,12 @@ public class UserController {
 	}
 
 	@PostMapping("/book")
-	public ResponseEntity<String> bookTickets(@RequestBody BookingDto bookingDTO) {
-		Booking booking = bookingService.bookTickets(bookingDTO);
-		return ResponseEntity.ok("Booking successful! Booking ID: " + booking.getBookingId());
+	public ResponseEntity<UserBookingDto> bookTickets(@RequestBody BookingDto bookingDTO) {
+		return new ResponseEntity<>(bookingService.bookTickets(bookingDTO), HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/cancel")
-    public ResponseEntity<String> cancelBooking(@RequestBody CancelDto cancelDto) {
-        try {
-            bookingService.cancelBooking(cancelDto);
-            return new ResponseEntity<>("Booking cancelled successfully", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
+	public ResponseEntity<UserBookingDto> cancelBooking(@RequestBody CancelDto cancelDto) {
+			return new ResponseEntity<>(bookingService.cancelBooking(cancelDto), HttpStatus.OK);
+	}
 }

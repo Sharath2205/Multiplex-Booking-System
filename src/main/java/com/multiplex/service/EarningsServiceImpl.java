@@ -28,8 +28,9 @@ public class EarningsServiceImpl {
 		
 		for(Earnings earning: earningsList) {
 			seatsBookedPerDay.put(earning.getBookingDate(), seatsBookedPerDay.getOrDefault(earning.getBookingDate(), 0) + earning.getSeatsBooked());
-			if(earning.getStatus().equals("booked"))
+			if(earning.getStatus().equals("booked")) 
 				totalEarningsPerDay.put(earning.getBookingDate(), totalEarningsPerDay.getOrDefault(earning.getBookingDate(), 0.0) + earning.getTotalBookingCost());
+				
 			if(earning.getStatus().equals("cancelled"))
 				cancellationChargesPerDay.put(earning.getBookingDate(), cancellationChargesPerDay.getOrDefault(earning.getBookingDate(), 0.0) + earning.getTotalBookingCost() * 0.2);
 		}
@@ -39,14 +40,13 @@ public class EarningsServiceImpl {
 		double totalEarnings = totalBookingCharges + totalCancellationCharges;
 		
 		EarningsOutputDto earningsOutputDto = new EarningsOutputDto();
-		earningsOutputDto.setSeatsBookedPerDate(seatsBookedPerDay);
-		earningsOutputDto.setTotalFaresPerDate(totalEarningsPerDay);
-		earningsOutputDto.setCancellationChargesPerDate(cancellationChargesPerDay);
+		earningsOutputDto.setSeatsBookedPerDay(seatsBookedPerDay);
+		earningsOutputDto.setTotalEarningsPerDay(totalEarningsPerDay);
+		earningsOutputDto.setCancellationChargesPerDay(cancellationChargesPerDay);
 		
 		earningsOutputDto.setTotalBookingCharges(totalBookingCharges);
 		earningsOutputDto.setTotalCancellationCharges(totalCancellationCharges);
 		earningsOutputDto.setTotalEarnings(totalEarnings);
-		System.out.println(earningsOutputDto);
 		return earningsOutputDto;
 	}
 	

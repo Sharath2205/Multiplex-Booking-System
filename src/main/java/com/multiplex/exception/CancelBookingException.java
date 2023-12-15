@@ -1,14 +1,13 @@
 package com.multiplex.exception;
 
-
 @SuppressWarnings("serial")
-public class InvalidDateOfBirthException extends RuntimeException {
+public class CancelBookingException extends RuntimeException {
 	private String message;
 
-	public InvalidDateOfBirthException() {
+	public CancelBookingException() {
 	}
 
-	public InvalidDateOfBirthException(String message) {
+	public CancelBookingException(String message) {
 		this.message = message;
 	}
 

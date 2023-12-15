@@ -89,5 +89,13 @@ public class Earnings {
 	public void setBookingDate(LocalDate bookingDate) {
 		this.bookingDate = bookingDate;
 	}
+
+	@Override
+	public String toString() {
+		return "Earnings [id=" + id + ", bookingId=" + bookingId + ", status=" + status + ", totalBookingCost="
+				+ totalBookingCost + ", seatsBooked=" + seatsBooked + ", bookingDate=" + bookingDate + "]";
+	}
+	
+	
 	
 }

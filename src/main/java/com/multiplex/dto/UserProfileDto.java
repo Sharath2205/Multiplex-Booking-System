@@ -2,14 +2,18 @@ package com.multiplex.dto;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 public class UserProfileDto {
+	@JsonProperty(access = Access.READ_ONLY)
 	private int userId;
 	private String userName;
 	private String emailId;
-	private String mobileNumber;
+	private long mobileNumber;
 	private LocalDate dateOfBirth;
 
-	public UserProfileDto(int userId, String userName, String emailId, String mobileNumber, LocalDate dateOfBirth) {
+	public UserProfileDto(int userId, String userName, String emailId, long mobileNumber, LocalDate dateOfBirth) {
 		super();
 		this.userId = userId;
 		this.userName = userName;
@@ -46,11 +50,11 @@ public class UserProfileDto {
 		this.emailId = emailId;
 	}
 
-	public String getMobileNumber() {
+	public long getMobileNumber() {
 		return mobileNumber;
 	}
 
-	public void setMobileNumber(String mobileNumber) {
+	public void setMobileNumber(long mobileNumber) {
 		this.mobileNumber = mobileNumber;
 	}
 

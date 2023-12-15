@@ -2,13 +2,13 @@ package com.multiplex.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,7 +28,8 @@ public class Movies {
 	@Column(name = "genre", length = 30)
 	private String genre;
 	
-	@OneToMany(mappedBy = "movie", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "movie", cascade = CascadeType.REMOVE)
+	@JsonBackReference
 	private List<Show> shows;
 
 	public Movies() {

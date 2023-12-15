@@ -4,83 +4,63 @@ import java.time.LocalDate;
 import java.util.Map;
 
 public class EarningsOutputDto {
-	private Map<LocalDate, Integer> seatsBookedPerDate;
-	private Map<LocalDate, Double> totalFaresPerDate;
-	private Map<LocalDate, Double> cancellationChargesPerDate;
+	private Map<LocalDate, Integer> seatsBookedPerDay;
+	private Map<LocalDate, Double> totalEarningsPerDay;
+	private Map<LocalDate, Double> cancellationChargesPerDay;
 	private double totalBookingCharges;
 	private double totalCancellationCharges;
 	private double totalEarnings;
-
 	public EarningsOutputDto() {
 		super();
 	}
-
-	public EarningsOutputDto(Map<LocalDate, Integer> seatsBookedPerDate, Map<LocalDate, Double> totalFaresPerDate,
-			Map<LocalDate, Double> cancellationChargesPerDate, double totalBookingCharges, double totalCancellationCharges,
-			double totalEarnings) {
+	public EarningsOutputDto(Map<LocalDate, Integer> seatsBookedPerDay, Map<LocalDate, Double> totalEarningsPerDay,
+			Map<LocalDate, Double> cancellationChargesPerDay, double totalBookingCharges,
+			double totalCancellationCharges, double totalEarnings) {
 		super();
-		this.seatsBookedPerDate = seatsBookedPerDate;
-		this.totalFaresPerDate = totalFaresPerDate;
-		this.cancellationChargesPerDate = cancellationChargesPerDate;
+		this.seatsBookedPerDay = seatsBookedPerDay;
+		this.totalEarningsPerDay = totalEarningsPerDay;
+		this.cancellationChargesPerDay = cancellationChargesPerDay;
 		this.totalBookingCharges = totalBookingCharges;
 		this.totalCancellationCharges = totalCancellationCharges;
 		this.totalEarnings = totalEarnings;
 	}
-
-	public Map<LocalDate, Integer> getSeatsBookedPerDate() {
-		return seatsBookedPerDate;
+	public Map<LocalDate, Integer> getSeatsBookedPerDay() {
+		return seatsBookedPerDay;
 	}
-
-	public void setSeatsBookedPerDate(Map<LocalDate, Integer> seatsBookedPerDate) {
-		this.seatsBookedPerDate = seatsBookedPerDate;
+	public void setSeatsBookedPerDay(Map<LocalDate, Integer> seatsBookedPerDay) {
+		this.seatsBookedPerDay = seatsBookedPerDay;
 	}
-
-	public Map<LocalDate, Double> getTotalFaresPerDate() {
-		return totalFaresPerDate;
+	public Map<LocalDate, Double> getTotalEarningsPerDay() {
+		return totalEarningsPerDay;
 	}
-
-	public void setTotalFaresPerDate(Map<LocalDate, Double> totalFaresPerDate) {
-		this.totalFaresPerDate = totalFaresPerDate;
+	public void setTotalEarningsPerDay(Map<LocalDate, Double> totalEarningsPerDay) {
+		this.totalEarningsPerDay = totalEarningsPerDay;
 	}
-
-	public Map<LocalDate, Double> getCancellationChargesPerDate() {
-		return cancellationChargesPerDate;
+	public Map<LocalDate, Double> getCancellationChargesPerDay() {
+		return cancellationChargesPerDay;
 	}
-
-	public void setCancellationChargesPerDate(Map<LocalDate, Double> cancellationChargesPerDate) {
-		this.cancellationChargesPerDate = cancellationChargesPerDate;
+	public void setCancellationChargesPerDay(Map<LocalDate, Double> cancellationChargesPerDay) {
+		this.cancellationChargesPerDay = cancellationChargesPerDay;
 	}
-
-	public double getTotalEarnings() {
+	public double getTotalBookingCharges() {
 		return totalBookingCharges;
 	}
-
 	public void setTotalBookingCharges(double totalBookingCharges) {
 		this.totalBookingCharges = totalBookingCharges;
 	}
-
 	public double getTotalCancellationCharges() {
 		return totalCancellationCharges;
 	}
-
 	public void setTotalCancellationCharges(double totalCancellationCharges) {
 		this.totalCancellationCharges = totalCancellationCharges;
 	}
-
-	public double getNetEarnings() {
+	public double getTotalEarnings() {
 		return totalEarnings;
 	}
-
 	public void setTotalEarnings(double totalEarnings) {
 		this.totalEarnings = totalEarnings;
 	}
 
-	@Override
-	public String toString() {
-		return "EarningsOutputDto [seatsBookedPerDate=" + seatsBookedPerDate + ", totalFaresPerDate="
-				+ totalFaresPerDate + ", cancellationChargesPerDate=" + cancellationChargesPerDate
-				+ ", totalBookingCharges=" + totalBookingCharges + ", totalCancellationCharges="
-				+ totalCancellationCharges + ", totalEarnings=" + totalEarnings + "]";
-	}
-
+	
+	
 }
