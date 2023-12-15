@@ -17,18 +17,18 @@ import com.multiplex.dto.UserLoginDto;
 import com.multiplex.dto.UserPasswordResetDto;
 import com.multiplex.entity.Booking;
 import com.multiplex.entity.User;
-import com.multiplex.serviceimpl.BookingService;
-import com.multiplex.serviceimpl.UserService;
+import com.multiplex.service.BookingServiceImpl;
+import com.multiplex.service.UserServiceImpl;
 
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {
 
 	@Autowired
-	UserService userService;
+	UserServiceImpl userService;
 
 	@Autowired
-	BookingService bookingService;
+	BookingServiceImpl bookingService;
 
 	@PostMapping(value = "/register", consumes = "application/json")
 	public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto) {

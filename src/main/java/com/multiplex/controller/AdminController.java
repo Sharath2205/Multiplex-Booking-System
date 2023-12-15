@@ -13,34 +13,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.multiplex.dto.EarningsInputDto;
+import com.multiplex.dto.EarningsOutputDto;
 import com.multiplex.dto.HallDto;
 import com.multiplex.dto.HallPublishedDto;
 import com.multiplex.dto.PublishMovieDto;
 import com.multiplex.dto.PublishShowDto;
-import com.multiplex.dto.ShowDto;
 import com.multiplex.entity.Hall;
-import com.multiplex.entity.Show;
 import com.multiplex.entity.User;
-import com.multiplex.serviceimpl.HallService;
-import com.multiplex.serviceimpl.MovieService;
-import com.multiplex.serviceimpl.ShowsService;
-import com.multiplex.serviceimpl.UserService;
+import com.multiplex.service.EarningsServiceImpl;
+import com.multiplex.service.HallServiceImpl;
+import com.multiplex.service.MovieServiceImpl;
+import com.multiplex.service.ShowsServiceImpl;
+import com.multiplex.service.UserServiceImpl;
 
 @RestController
 @RequestMapping("/api/v1/admin")
 public class AdminController {
 
 	@Autowired
-	UserService userService;
+	UserServiceImpl userService;
 
 	@Autowired
-	ShowsService showsService;
+	ShowsServiceImpl showsService;
 
 	@Autowired
-	HallService hallService;
+	HallServiceImpl hallService;
 	
 	@Autowired
-	MovieService movieService;
+	MovieServiceImpl movieService;
+	
+	@Autowired
+	EarningsServiceImpl earningsService;
 
 	@GetMapping("/getAllUsers")
 	public ResponseEntity<List<User>> getAllUsers() {
@@ -81,4 +85,10 @@ public class AdminController {
     public ResponseEntity<String> addMovie(@RequestBody PublishMovieDto publishMovieDto) {
     	return new ResponseEntity<>(movieService.addMovie(publishMovieDto),HttpStatus.OK);
     }
+    
+    @PostMapping("/earningreport")
+    public ResponseEntity<EarningsOutputDto> generateEarningsReport(@RequestBody EarningsInputDto earningsInputDto) {
+    	return new ResponseEntity<>(earningsService.generateEarningsReport(earningsInputDto),HttpStatus.OK);
+    }
+    
 }

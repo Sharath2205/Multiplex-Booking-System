@@ -1,4 +1,4 @@
-package com.multiplex.serviceimpl;
+package com.multiplex.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.multiplex.dto.PublishShowDto;
-import com.multiplex.dto.ShowDto;
 import com.multiplex.dto.UserShowsDto;
 import com.multiplex.entity.Hall;
 import com.multiplex.entity.HallCapacity;
@@ -24,7 +23,6 @@ import com.multiplex.exception.MovieNotFoundException;
 import com.multiplex.exception.ShowNotFoundException;
 import com.multiplex.exception.ShowOverlapException;
 import com.multiplex.exception.UserNotFoundException;
-import com.multiplex.iservice.IShowsService;
 import com.multiplex.repository.HallRepository;
 import com.multiplex.repository.MovieRepository;
 import com.multiplex.repository.ShowAvailabilityRepository;
@@ -33,7 +31,7 @@ import com.multiplex.repository.UserRepository;
 import com.multiplex.util.AppConstants;
 
 @Service
-public class ShowsService implements IShowsService {
+public class ShowsServiceImpl implements ShowsService {
 
 	@Autowired
 	ShowsRepository showsRepository;

@@ -1,4 +1,4 @@
-package com.multiplex.iservice;
+package com.multiplex.service;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import com.multiplex.dto.UserPasswordResetDto;
 import com.multiplex.entity.User;
 
 @Service
-public interface IUserService {
+public interface UserService {
 	
 	UserDto registerUser(UserDto userDto);
 	

@@ -1,8 +1,8 @@
-package com.multiplex.iservice;
+package com.multiplex.service;
 
 import com.multiplex.dto.HallDto;
 import com.multiplex.dto.HallPublishedDto;
 
-public interface IHallInterface {
+public interface HallService {
 	HallPublishedDto addHallWithSeatTypes(HallDto hallDto);
 }

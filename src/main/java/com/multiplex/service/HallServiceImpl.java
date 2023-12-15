@@ -1,4 +1,4 @@
-package com.multiplex.serviceimpl;
+package com.multiplex.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,14 +16,13 @@ import com.multiplex.entity.HallCapacity;
 import com.multiplex.entity.SeatType;
 import com.multiplex.exception.HallAlreadyExistsException;
 import com.multiplex.exception.HallNotFoundException;
-import com.multiplex.iservice.IHallInterface;
 import com.multiplex.repository.HallCapacityRepository;
 import com.multiplex.repository.HallRepository;
 import com.multiplex.repository.SeatTypeRepository;
 import com.multiplex.util.AppConstants;
 
 @Service
-public class HallService implements IHallInterface {
+public class HallServiceImpl implements HallService {
 
 	@Autowired
 	HallCapacityRepository hallCapacityRepository;

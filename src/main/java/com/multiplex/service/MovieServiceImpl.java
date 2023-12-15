@@ -1,4 +1,4 @@
-package com.multiplex.serviceimpl;
+package com.multiplex.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +13,11 @@ import com.multiplex.dto.UserShowsDto;
 import com.multiplex.entity.Movies;
 import com.multiplex.entity.Show;
 import com.multiplex.exception.MovieNotFoundException;
-import com.multiplex.iservice.IMovieService;
 import com.multiplex.repository.MovieRepository;
 import com.multiplex.util.AppConstants;
 
 @Service
-public class MovieService implements IMovieService {
+public class MovieServiceImpl implements MovieService {
 
 	@Autowired
 	MovieRepository movieRepository;

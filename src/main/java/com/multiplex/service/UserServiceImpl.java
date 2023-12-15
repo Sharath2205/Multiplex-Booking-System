@@ -1,4 +1,4 @@
-package com.multiplex.serviceimpl;
+package com.multiplex.service;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,12 +20,11 @@ import com.multiplex.exception.PasswordMismatchException;
 import com.multiplex.exception.SameOldAndNewPasswordException;
 import com.multiplex.exception.UserCreationException;
 import com.multiplex.exception.UserNotFoundException;
-import com.multiplex.iservice.IUserService;
 import com.multiplex.repository.UserRepository;
 import com.multiplex.util.AppConstants;
 
 @Service
-public class UserService implements IUserService {
+public class UserServiceImpl implements UserService {
 	@Autowired
 	UserRepository userRepository;
 

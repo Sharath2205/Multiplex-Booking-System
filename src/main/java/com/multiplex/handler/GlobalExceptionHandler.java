@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.multiplex.handler;
 
 import org.springframework.http.HttpStatus;

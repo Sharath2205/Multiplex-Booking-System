@@ -1,11 +1,11 @@
-package com.multiplex.iservice;
+package com.multiplex.service;
 
 import java.util.List;
 
 import com.multiplex.dto.PublishShowDto;
 import com.multiplex.dto.UserShowsDto;
 
-public interface IShowsService {
+public interface ShowsService {
 	
 	boolean addShow(PublishShowDto showDto);
 	
