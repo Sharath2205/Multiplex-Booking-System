@@ -20,5 +20,4 @@ public class BookingException extends RuntimeException {
 	public String toString() {
 		return "BookingException : " + message;
 	}
-
 }

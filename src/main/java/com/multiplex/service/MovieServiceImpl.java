@@ -27,11 +27,12 @@ public class MovieServiceImpl implements MovieService {
 		movie.setMovieName(movieDto.getMovieName());
 		movie.setGenre(movieDto.getGenre());
 		movie = movieRepository.save(movie);
-		return movie.getMovieId() > 0 ? "Movie added successfully" : "Oops! Try again";
+		return "Movie added successfully";
 	}
 
 	public Movies getByMovieId(int movieId) {
-		return movieRepository.findById(movieId).get();
+	    Optional<Movies> optionalMovie = movieRepository.findById(movieId);
+		return optionalMovie.orElseThrow(() -> new MovieNotFoundException("Movie not found with ID: " + movieId));
 	}
 	
 	public MoviesDto getMovieDetailsByName(String movieName) {
@@ -41,7 +42,7 @@ public class MovieServiceImpl implements MovieService {
         	List<UserShowsDto> shows = new ArrayList<>();
         	
         	for(Show show: movie.getShows()) {
-        		shows.add(new UserShowsDto( show.getHall().getHallDesc(), show.getMovie().getMovieName() ,show.getSlotNo(), show.getFromDate(), show.getToDate()));
+        		shows.add(new UserShowsDto(show.getHall().getHallDesc(), show.getMovie().getMovieName() ,show.getSlotNo(), show.getFromDate(), show.getToDate()));
         	}
         	
         	return new MoviesDto(movie.getMovieId(), movie.getMovieName(), movie.getGenre(), shows);

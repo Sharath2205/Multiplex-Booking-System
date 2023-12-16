@@ -55,7 +55,7 @@ public class ShowsServiceImpl implements ShowsService {
 	@Transactional(readOnly = false)
 	public boolean addShow(PublishShowDto showDto) {
 		Optional<User> opUser = userRepository.findById(showDto.getAdminId());
-	    if (opUser.isPresent() && opUser.get().getUserType() != 'A') throw new UserNotFoundException(AppConstants.ADMIN_NOT_FOUND);
+	    if (opUser.isEmpty() ||  opUser.get().getUserType() != 'A') throw new UserNotFoundException(AppConstants.ADMIN_NOT_FOUND);
 
 	    Hall hall = hallRepository.findByHallDescIgnoreCase(showDto.getHallName())
 	            .orElseThrow(() -> new HallNotFoundException(AppConstants.HALL_DESC_NOT_FOUND.replace("#", showDto.getHallName())));
