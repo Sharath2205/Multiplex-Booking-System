@@ -36,6 +36,8 @@ public class AppConstants {
 	public static final String SHOW_ALREADY_RUNNING = "A show is already running in the hall 1 with in 2 slot till 3";
 	public static final String NO_SHOW_RUNNING = "Show is not available on the selected Date: date";
 	public static final String NO_SHOW_AVAILABILITY = "No availability found for the specified show, hall, seat type, and date";
+	public static final String SHOW_DELECTION_ERROR = "Unable to delete show. Please cancel all the bookings before deleting the show";
+	
 	
 	
 	// ---------------- HALL EXCEPTION MESSAGES ------------------
@@ -43,13 +45,14 @@ public class AppConstants {
 	public static final String HALL_WITH_DESC_ALREADY_EXISTS = "Hall with name # already exists";
 	public static final String NO_HALLS_FOUND = "No Halls available at this moment";
 	public static final String HALL_WITH_ID_NOT_FOUND = "Hall with ID # not found";
+	public static final String HALL_DELECTION_ERROR = "Unable to delete hall. Please cancel all the Shows before deleting the hall";
 	
 	// ---------------- BOOKING EXCEPTION MESSAGES
 	public static final String NO_SEAT_TYPE = "Please select any seat to book a ticket";
 	public static final String INSUFFICIENT_SEATS_FOR_SEAT_TYPE = "Insufficient seats available for seat type: ";
 	public static final String BOOKING_NOT_FOUND_WITH_ID = "Booking not found with ID: ";
 	public static final String NOT_VALID_USER = "User does not have permission to cancel this booking";
-	public static final String ALL_SEATS_NOT_AVAILABLE = "Only # seats remaining for seat type *";
+	public static final String ALL_SEATS_NOT_AVAILABLE = "Only # seats remaining";
 	
 	
 	private AppConstants() {}

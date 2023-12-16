@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.multiplex.dto.PublishShowDto;
 import com.multiplex.dto.UserShowsDto;
+import com.multiplex.entity.Booking;
 
 public interface ShowsService {
 	
@@ -14,4 +15,6 @@ public interface ShowsService {
 	List<UserShowsDto> getAllShowsByMovieName(String movieName);
 	
 	UserShowsDto getShowById(int showId);
+	
+	List<Booking> getAllBookingsByShowId(int showId);
 }

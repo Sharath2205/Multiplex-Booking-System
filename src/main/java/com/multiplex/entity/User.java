@@ -27,27 +27,27 @@ public class User {
 
 	@Column(name = "user_name", length = 45, nullable = false)
 	private String userName;
-	
+
 	@Column(name = "user_password", nullable = false)
 	private String password;
-	
+
 	@Column(name = "user_type", nullable = false)
 	private char userType = 'U';
-	
+
 	@Column(name = "mobile_no", length = 10, nullable = false)
 	private long mobileNumber;
-	
+
 	@Column(name = "email_id", length = 225, unique = true)
 	private String emailId;
-	
+
 	@Column(name = "date_of_birth")
 	private LocalDate dateOfBirth;
-	
+
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Booking> booking;
-	
+
 	public User() {
-		
+
 	}
 
 	public User(int userId, String userName, String password, char userType, long mobileNumber, String emailId,
@@ -60,6 +60,12 @@ public class User {
 		this.mobileNumber = mobileNumber;
 		this.emailId = emailId;
 		this.dateOfBirth = dateOfBirth;
+	}
+
+	public User(String userName, String emailId, long mobileNumber) {
+		this.userName = userName;
+		this.mobileNumber = mobileNumber;
+		this.emailId = emailId;
 	}
 
 	public int getUserId() {

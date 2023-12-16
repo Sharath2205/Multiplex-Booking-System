@@ -31,7 +31,6 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional(readOnly = false)
 	public UserDto registerUser(UserDto userDto) {
-		System.out.println(userDto.getConfirmPassword());
 		Optional<User> optionalUser = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId());
 
 		if (optionalUser.isPresent()) {
@@ -52,7 +51,7 @@ public class UserServiceImpl implements UserService {
 			if (!(Long.toString(userDto.getMobileNumber()).matches(AppConstants.MOBILE_NUMBER_REGEX))) {
 				throw new UserCreationException(AppConstants.INVALID_MOBILE_NUMBER);
 			}
-			if(!userDto.getDateOfBirth().isBefore(LocalDate.now())) {
+			if (!userDto.getDateOfBirth().isBefore(LocalDate.now())) {
 				throw new InvalidDateOfBirthException(AppConstants.INVALID_DATE_OF_BIRTH);
 			}
 		}
@@ -75,41 +74,43 @@ public class UserServiceImpl implements UserService {
 			if (registeredUser.get().getPassword().equals(userDto.getPassword())) {
 				return "Logged in successfully. Welcome " + registeredUser.get().getUserName();
 			}
-			throw new InvalidEmailException(AppConstants.INVALID_CREDENTIALS);
+			throw new InvalidPasswordException(AppConstants.INVALID_CREDENTIALS);
 		}
 		throw new UserNotFoundException(AppConstants.USER_NOT_FOUND.replace("#", userDto.getEmailId()));
 	}
 
 	@Transactional(readOnly = false)
 	public String resetPassword(UserPasswordResetDto userDto) {
-		if (userDto.getEmailId() != null) {
-			Optional<User> user = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId().toLowerCase());
-			if (user.isPresent()) {
-				User dbUser = user.get();
-				if (userDto.getPassword() != null && userDto.getConfirmPassword() != null) {
-					if (!userDto.getPassword().matches(AppConstants.PASSWORD_REGEX)
-							|| !userDto.getConfirmPassword().matches(AppConstants.PASSWORD_REGEX)) {
-						throw new InvalidPasswordException(AppConstants.INVALID_PASSWORD);
-					}
+	    if (userDto.getEmailId() != null) {
+	        Optional<User> user = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId().toLowerCase());
+	        if (user.isPresent()) {
+	            User dbUser = user.get();
+	            if (userDto.getPassword() != null && userDto.getConfirmPassword() != null) {
+	                if (!userDto.getPassword().matches(AppConstants.PASSWORD_REGEX)
+	                        || !userDto.getConfirmPassword().matches(AppConstants.PASSWORD_REGEX)) {
+	                    throw new InvalidPasswordException(AppConstants.INVALID_PASSWORD);
+	                }
 
-					if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
-						throw new PasswordMismatchException(AppConstants.PASSWORD_MISMATCH);
-					}
+	                if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
+	                    throw new PasswordMismatchException(AppConstants.PASSWORD_MISMATCH);
+	                }
 
-					if (userDto.getPassword().equals(user.get().getPassword())) {
-						throw new SameOldAndNewPasswordException(AppConstants.SAME_OLD_AND_NEW_PASSWORD);
-					}
+	                if (userDto.getPassword().equals(dbUser.getPassword())) {
+	                    throw new SameOldAndNewPasswordException(AppConstants.SAME_OLD_AND_NEW_PASSWORD);
+	                }
 
-					dbUser.setPassword(userDto.getPassword());
-					userRepository.save(dbUser);
-					return "Password Reset Successfull";
-				} else {
-					throw new InvalidPasswordException(AppConstants.ENTER_NEW_AND_CONFIRM_PASSWORD);
-				}
-			}
-			throw new UserNotFoundException(AppConstants.USER_NOT_FOUND.replace("#", userDto.getEmailId()));
-		}
-		throw new InvalidEmailException(AppConstants.INVALID_CREDENTIALS);
+	                dbUser.setPassword(userDto.getPassword());
+	                userRepository.save(dbUser);
+	                return "Password Reset Successfully";
+	            } else {
+	                throw new InvalidPasswordException(AppConstants.ENTER_NEW_AND_CONFIRM_PASSWORD);
+	            }
+	        } else {
+	            throw new UserNotFoundException(AppConstants.USER_NOT_FOUND.replace("#", userDto.getEmailId()));
+	        }
+	    } else {
+	        throw new InvalidEmailException(AppConstants.INVALID_CREDENTIALS);
+	    }
 	}
 
 	@Transactional(readOnly = true)
@@ -173,7 +174,7 @@ public class UserServiceImpl implements UserService {
 				userProfileDto.setEmailId(dbUser.getEmailId());
 				userProfileDto.setMobileNumber(dbUser.getMobileNumber());
 				userProfileDto.setUserName(dbUser.getUserName());
-				
+
 				return userProfileDto;
 			}
 			throw new UserNotFoundException(AppConstants.USER_NOT_FOUND.replace("#", user.getEmailId()));

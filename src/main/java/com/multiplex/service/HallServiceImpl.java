@@ -15,6 +15,7 @@ import com.multiplex.entity.Hall;
 import com.multiplex.entity.HallCapacity;
 import com.multiplex.entity.SeatType;
 import com.multiplex.exception.HallAlreadyExistsException;
+import com.multiplex.exception.HallDeletionException;
 import com.multiplex.exception.HallNotFoundException;
 import com.multiplex.repository.HallCapacityRepository;
 import com.multiplex.repository.HallRepository;
@@ -97,8 +98,14 @@ public class HallServiceImpl implements HallService {
 	}
 
 	public boolean deleteHallById(int hallId) {
-		if (hallRepository.findById(hallId).isEmpty())
+		Optional<Hall> opHall = hallRepository.findById(hallId);
+		if (opHall.isEmpty())
 			throw new HallNotFoundException(AppConstants.HALL_WITH_ID_NOT_FOUND.replace("#", Integer.toString(hallId)));
+		
+		Hall hall = opHall.get();
+		
+		if(!hall.getShows().isEmpty()) throw new HallDeletionException(AppConstants.HALL_DELECTION_ERROR);
+		
 		long count = hallRepository.count();
 		hallRepository.deleteById(hallId);
 		return count > hallRepository.count();

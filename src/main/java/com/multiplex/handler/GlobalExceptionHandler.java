@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.multiplex.exception.BookingException;
 import com.multiplex.exception.BookingNotFoundException;
 import com.multiplex.exception.CancelBookingException;
+import com.multiplex.exception.HallDeletionException;
 import com.multiplex.exception.HallNotFoundException;
 import com.multiplex.exception.InsufficentInformationException;
 import com.multiplex.exception.InvalidDateOfBirthException;
@@ -22,6 +23,7 @@ import com.multiplex.exception.MovieNotFoundException;
 import com.multiplex.exception.PasswordMismatchException;
 import com.multiplex.exception.SameOldAndNewPasswordException;
 import com.multiplex.exception.SeatNotAvailableException;
+import com.multiplex.exception.ShowDeletionException;
 import com.multiplex.exception.ShowNotFoundException;
 import com.multiplex.exception.ShowOverlapException;
 import com.multiplex.exception.UserCreationException;
@@ -140,10 +142,26 @@ public final class GlobalExceptionHandler {
 		return new ResponseEntity<>(error, HttpStatus.valueOf(400));
 	}
 	
+	@ExceptionHandler(ShowDeletionException.class)
+	public ResponseEntity<ApiError> showDeletionExceptionHandler(ShowDeletionException ex) {
+		error.setStatus(HttpStatus.BAD_REQUEST);
+    	error.setMessage(ex.getMessage());
+    	error.setTimestamp(LocalDateTime.now());
+    	return new ResponseEntity<>(error, HttpStatus.valueOf(400));
+	}
+	
 	// ----------------------- HALL EXCEPTION HANDLERS ----------------------------
 	
 	@ExceptionHandler(HallNotFoundException.class)
 	public ResponseEntity<ApiError> hallNotFoundExceptionHandler(HallNotFoundException ex) {
+		error.setStatus(HttpStatus.BAD_REQUEST);
+    	error.setMessage(ex.getMessage());
+    	error.setTimestamp(LocalDateTime.now());
+    	return new ResponseEntity<>(error, HttpStatus.valueOf(400));
+	}
+	
+	@ExceptionHandler(HallDeletionException.class)
+	public ResponseEntity<ApiError> hallDeletionExceptionHandler(HallDeletionException ex) {
 		error.setStatus(HttpStatus.BAD_REQUEST);
     	error.setMessage(ex.getMessage());
     	error.setTimestamp(LocalDateTime.now());

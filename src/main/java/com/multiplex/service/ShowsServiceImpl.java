@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.multiplex.dto.BookingDto;
 import com.multiplex.dto.PublishShowDto;
+import com.multiplex.dto.UserBookingDto;
 import com.multiplex.dto.UserShowsDto;
+import com.multiplex.entity.Booking;
 import com.multiplex.entity.Hall;
 import com.multiplex.entity.HallCapacity;
 import com.multiplex.entity.Movies;
@@ -20,6 +23,7 @@ import com.multiplex.entity.User;
 import com.multiplex.exception.HallNotFoundException;
 import com.multiplex.exception.InvalidSlotNumberException;
 import com.multiplex.exception.MovieNotFoundException;
+import com.multiplex.exception.ShowDeletionException;
 import com.multiplex.exception.ShowNotFoundException;
 import com.multiplex.exception.ShowOverlapException;
 import com.multiplex.exception.UserNotFoundException;
@@ -102,9 +106,16 @@ public class ShowsServiceImpl implements ShowsService {
 
 	@Transactional(readOnly = false)
 	public boolean deleteShowById(int id) {
-		Optional<Show> show = showsRepository.findById(id);
+		Optional<Show> opShow = showsRepository.findById(id);
 
-		if (show.isPresent()) {
+		if (opShow.isPresent()) {
+			
+			Show show = opShow.get();
+			
+			if(show.getBooking() != null && show.getBooking().size() != 0) {
+				throw new ShowDeletionException(AppConstants.SHOW_DELECTION_ERROR);
+			}
+			
 			showsRepository.deleteById(id);
 			return true;
 		}
@@ -141,6 +152,15 @@ public class ShowsServiceImpl implements ShowsService {
 					show.getSlotNo(), show.getFromDate(), show.getToDate());
 		}
 		throw new ShowNotFoundException(AppConstants.SHOWS_NOT_FOUND + showId);
+	}
+	
+	public List<Booking> getAllBookingsByShowId(int showId) {
+		Optional<Show> opShow = showsRepository.findById(showId);
+		
+		if(opShow.isPresent()) {
+			return opShow.get().getBooking();
+		}
+		throw new ShowNotFoundException(AppConstants.SHOW_ID_NOT_FOUND.replace("#", Integer.toString(showId)));
 	}
 	
 }

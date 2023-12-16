@@ -19,7 +19,10 @@ import com.multiplex.dto.HallDto;
 import com.multiplex.dto.HallPublishedDto;
 import com.multiplex.dto.PublishMovieDto;
 import com.multiplex.dto.PublishShowDto;
+import com.multiplex.dto.UserBookingDto;
+import com.multiplex.entity.Booking;
 import com.multiplex.entity.Hall;
+import com.multiplex.entity.Show;
 import com.multiplex.entity.User;
 import com.multiplex.service.EarningsService;
 import com.multiplex.service.HallService;
@@ -86,9 +89,8 @@ public class AdminController {
     	return new ResponseEntity<>(movieService.addMovie(publishMovieDto),HttpStatus.OK);
     }
     
-    @PostMapping("/earningreport")
+    @GetMapping("/earningreport")
     public ResponseEntity<EarningsOutputDto> generateEarningsReport(@RequestBody EarningsInputDto earningsInputDto) {
     	return new ResponseEntity<>(earningsService.generateEarningsReport(earningsInputDto),HttpStatus.OK);
     }
-    
 }

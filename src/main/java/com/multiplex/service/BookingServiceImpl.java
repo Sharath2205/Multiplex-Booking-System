@@ -66,8 +66,6 @@ public class BookingServiceImpl implements BookingService {
 	@Transactional
 	public UserBookingDto bookTickets(BookingDto bookingDTO) {
 		
-		System.out.println(bookingDTO);
-		
 		// Checking if the user is a registered user or not
 		User user = userRepository.findByEmailIdIgnoreCase(bookingDTO.getUserEmail())
 				.orElseThrow(() -> new UserNotFoundException(AppConstants.USER_NOT_REGISTERED));
@@ -88,7 +86,6 @@ public class BookingServiceImpl implements BookingService {
 
 		if (selectedSeatTypeCounts.values().stream().noneMatch(i -> i > 0))
 			throw new BookingException(AppConstants.NO_SEAT_TYPE);
-
 		Booking booking = new Booking();
 		booking.setBookedDate(LocalDateTime.now());
 		booking.setShowDate(bookingDate);
@@ -110,7 +107,6 @@ public class BookingServiceImpl implements BookingService {
 			ShowAvailability showAvailability =  showAvailabilityRepository
 					.findByShowAndHallAndSeatTypeAndAvailabilityDate(show, show.getHall(), selectedSeatType, bookingDate)
 					.orElseThrow(() -> new ShowNotFoundException(AppConstants.NO_SHOW_AVAILABILITY));
-
 			int remainingSeats = showAvailability.getRemainingSeats();
 			int numberOfSeats = selectedSeatTypeCounts.get(selectedSeatType.getSeatTypeDesc());
 
@@ -133,16 +129,14 @@ public class BookingServiceImpl implements BookingService {
 
 			} else { 
 				// As we are aborting the booking delete the booking record from the db
-				bookingDetailsRepository.deleteAll(booking.getBookingDetails());
 				bookingRepository.delete(booking);
 				
 				// If the remaining seats are less than required seats inform user if he/she wants to booking the available seats
 				if (remainingSeats > 0) {
 					throw new SeatNotAvailableException(AppConstants.ALL_SEATS_NOT_AVAILABLE.replace("#",
-							Integer.toString(remainingSeats).replace("*", selectedSeatType.getSeatTypeDesc())));
+							Integer.toString(remainingSeats) + " " + selectedSeatType.getSeatTypeDesc()));
 				} else { 
 					// if the seats are not available send on seats available exception
-					bookingDetailsRepository.deleteAll(booking.getBookingDetails());
 					bookingRepository.delete(booking);
 					throw new SeatNotAvailableException(
 							AppConstants.INSUFFICIENT_SEATS_FOR_SEAT_TYPE + selectedSeatType.getSeatTypeDesc());

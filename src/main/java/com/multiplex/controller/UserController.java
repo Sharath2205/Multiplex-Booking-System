@@ -66,6 +66,8 @@ public class UserController {
 			return new ResponseEntity<>(bookingService.cancelBooking(cancelDto), HttpStatus.OK);
 	}
 	
+//	@GetMapping()
+	
 //	@GetMapping("/dashboard")
 //	public ResponseEntity<>
 }
