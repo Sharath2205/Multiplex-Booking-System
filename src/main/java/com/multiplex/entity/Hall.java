@@ -32,6 +32,17 @@ public class Hall {
 	
 	@OneToMany(mappedBy = "hall", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
 	private List<Show> shows;
+	
+	@OneToMany(mappedBy = "hall", cascade = CascadeType.ALL)
+	private List<ShowAvailability> showAvailabilities;
+	
+	public List<ShowAvailability> getShowAvailabilities() {
+		return showAvailabilities;
+	}
+
+	public void setShowAvailabilities(List<ShowAvailability> showAvailabilities) {
+		this.showAvailabilities = showAvailabilities;
+	}
 
 	public Hall() {
 		super();

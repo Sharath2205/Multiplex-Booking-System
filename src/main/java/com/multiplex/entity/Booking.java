@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,7 +44,7 @@ public class Booking {
 	@JoinColumn(name = "user_id")
 	private User user;
 	
-	@OneToMany(mappedBy = "booking")
+	@OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
 	private List<BookingDetails> bookingDetails;
 
 	public Booking() {
@@ -133,6 +134,4 @@ public class Booking {
 		return "Booking [bookingId=" + bookingId + ", bookedDate=" + bookedDate + ", showDate=" + showDate + ", shows="
 				+ shows.getShowId() + ", user=" + user.getEmailId() + ", bookingDetails=" + bookingDetails.isEmpty() + "]";
 	}
-
-
 }

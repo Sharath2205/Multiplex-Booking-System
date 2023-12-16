@@ -12,4 +12,6 @@ public interface ShowsService {
 	boolean deleteShowById(int id);
 	
 	List<UserShowsDto> getAllShowsByMovieName(String movieName);
+	
+	UserShowsDto getShowById(int showId);
 }

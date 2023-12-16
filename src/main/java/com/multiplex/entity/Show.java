@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -48,6 +49,18 @@ public class Show {
 	@OneToMany(mappedBy = "shows", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
 	@JsonBackReference(value = "show_id")
 	private List<Booking> booking;
+	
+	@OneToMany(mappedBy = "show", cascade = CascadeType.ALL)
+	@JsonIgnore
+	private List<ShowAvailability> showAvailabilities;
+
+	public List<ShowAvailability> getShowAvailabilities() {
+		return showAvailabilities;
+	}
+
+	public void setShowAvailabilities(List<ShowAvailability> showAvailabilities) {
+		this.showAvailabilities = showAvailabilities;
+	}
 
 	public Show() {
 		super();

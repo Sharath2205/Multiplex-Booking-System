@@ -17,18 +17,18 @@ import com.multiplex.dto.UserDto;
 import com.multiplex.dto.UserLoginDto;
 import com.multiplex.dto.UserPasswordResetDto;
 import com.multiplex.dto.UserProfileDto;
-import com.multiplex.service.BookingServiceImpl;
-import com.multiplex.service.UserServiceImpl;
+import com.multiplex.service.BookingService;
+import com.multiplex.service.UserService;
 
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {
 
 	@Autowired
-	UserServiceImpl userService;
+	private UserService userService;
 
 	@Autowired
-	BookingServiceImpl bookingService;
+	private BookingService bookingService;
 
 	@PostMapping(value = "/register", consumes = "application/json")
 	public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto) {
@@ -65,4 +65,7 @@ public class UserController {
 	public ResponseEntity<UserBookingDto> cancelBooking(@RequestBody CancelDto cancelDto) {
 			return new ResponseEntity<>(bookingService.cancelBooking(cancelDto), HttpStatus.OK);
 	}
+	
+//	@GetMapping("/dashboard")
+//	public ResponseEntity<>
 }

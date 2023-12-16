@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.multiplex.dto.UserShowsDto;
-import com.multiplex.service.ShowsServiceImpl;
+import com.multiplex.service.ShowsService;
 
 @RestController
 @RequestMapping("/api/v1/shows")
 public class ShowsController {
 	
 	@Autowired
-	private ShowsServiceImpl showService;
+	private ShowsService showService;
 	
 	@GetMapping(value = "/{showId}")
 	public ResponseEntity<UserShowsDto> getShowById(@PathVariable int showId) {

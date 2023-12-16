@@ -1,5 +1,12 @@
 package com.multiplex.service;
 
-public interface BookingService {
+import com.multiplex.dto.BookingDto;
+import com.multiplex.dto.CancelDto;
+import com.multiplex.dto.UserBookingDto;
 
+public interface BookingService {
+	
+	UserBookingDto bookTickets(BookingDto bookingDTO);
+	
+	UserBookingDto cancelBooking(CancelDto cancelDto);
 }

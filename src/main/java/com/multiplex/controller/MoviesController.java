@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.multiplex.dto.MoviesDto;
-import com.multiplex.service.MovieServiceImpl;
+import com.multiplex.service.MovieService;
 
 @RestController
 @RequestMapping("/api/v1/movies")
 public class MoviesController {
 
 	@Autowired
-	MovieServiceImpl movieService;
+	private MovieService movieService;
 	
 	@GetMapping(value = "/{movieName}")
 	public ResponseEntity<MoviesDto> getMovieByMovieName(@PathVariable String movieName) {

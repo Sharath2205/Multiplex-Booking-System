@@ -21,30 +21,30 @@ import com.multiplex.dto.PublishMovieDto;
 import com.multiplex.dto.PublishShowDto;
 import com.multiplex.entity.Hall;
 import com.multiplex.entity.User;
-import com.multiplex.service.EarningsServiceImpl;
-import com.multiplex.service.HallServiceImpl;
-import com.multiplex.service.MovieServiceImpl;
-import com.multiplex.service.ShowsServiceImpl;
-import com.multiplex.service.UserServiceImpl;
+import com.multiplex.service.EarningsService;
+import com.multiplex.service.HallService;
+import com.multiplex.service.MovieService;
+import com.multiplex.service.ShowsService;
+import com.multiplex.service.UserService;
 
 @RestController
 @RequestMapping("/api/v1/admin")
 public class AdminController {
 
 	@Autowired
-	UserServiceImpl userService;
+	private UserService userService;
 
 	@Autowired
-	ShowsServiceImpl showsService;
+	private ShowsService showsService;
 
 	@Autowired
-	HallServiceImpl hallService;
+	private HallService hallService;
 	
 	@Autowired
-	MovieServiceImpl movieService;
+	private MovieService movieService;
 	
 	@Autowired
-	EarningsServiceImpl earningsService;
+	private EarningsService earningsService;
 
 	@GetMapping("/getAllUsers")
 	public ResponseEntity<List<User>> getAllUsers() {

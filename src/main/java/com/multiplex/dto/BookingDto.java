@@ -53,4 +53,9 @@ public class BookingDto {
 		this.selectedSeatType = selectedSeatType;
 	}
 
+	@Override
+	public String toString() {
+		return "BookingDto [userEmail=" + userEmail + ", showId=" + showId + ", bookingDate=" + bookingDate
+				+ ", selectedSeatType=" + selectedSeatType + "]";
+	}
 }

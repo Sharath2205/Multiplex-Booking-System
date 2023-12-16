@@ -117,16 +117,16 @@ public class UserServiceImpl implements UserService {
 		return userRepository.findAll();
 	}
 
-	@Transactional(readOnly = true)
-	public User getUserByName(String name) {
-		if (name == null) {
-			Optional<User> optionalUser = userRepository.findByUserName(name);
-			if (optionalUser.isPresent())
-				return optionalUser.get();
-			throw new UserNotFoundException(AppConstants.USER_NAME_NOT_FOUND.replace("#", name));
-		}
-		throw new InsufficentInformationException(AppConstants.INSUFFICENT_INFORMATION);
-	}
+//	@Transactional(readOnly = true)
+//	public User getUserByName(String name) {
+//		if (name == null) {
+//			Optional<User> optionalUser = userRepository.findByUserName(name);
+//			if (optionalUser.isPresent())
+//				return optionalUser.get();
+//			throw new UserNotFoundException(AppConstants.USER_NAME_NOT_FOUND.replace("#", name));
+//		}
+//		throw new InsufficentInformationException(AppConstants.INSUFFICENT_INFORMATION);
+//	}
 
 	@Transactional(readOnly = false)
 	public String deleteUser(UserLoginDto userDto) {

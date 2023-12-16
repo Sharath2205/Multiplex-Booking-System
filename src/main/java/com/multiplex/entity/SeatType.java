@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,10 +27,10 @@ public class SeatType {
 	@Column(name = "seat_fare")
 	private float seatFare;
 	
-	@OneToMany(mappedBy = "seatType")
+	@OneToMany(mappedBy = "seatType", cascade = CascadeType.REMOVE)
 	private List<BookingDetails> bookingDetails;
 	
-	@OneToMany(mappedBy = "seatType")
+	@OneToMany(mappedBy = "seatType", cascade = CascadeType.REMOVE)
 	private List<HallCapacity> hallCapacities;
 	
 	 	

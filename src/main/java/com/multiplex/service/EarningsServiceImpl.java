@@ -14,7 +14,7 @@ import com.multiplex.entity.Earnings;
 import com.multiplex.repository.EarningsRepository;
 
 @Service
-public class EarningsServiceImpl {
+public class EarningsServiceImpl implements EarningsService {
 	
 	@Autowired
 	private EarningsRepository earningsRepository;

@@ -27,23 +27,11 @@ public class MovieServiceImpl implements MovieService {
 		movie.setMovieName(movieDto.getMovieName());
 		movie.setGenre(movieDto.getGenre());
 		movie = movieRepository.save(movie);
-		return movie != null ? "Movie added successfully" : "Oops! Try again";
+		return movie.getMovieId() > 0 ? "Movie added successfully" : "Oops! Try again";
 	}
 
 	public Movies getByMovieId(int movieId) {
 		return movieRepository.findById(movieId).get();
-	}
-	
-	public Movies getById(int movieId) {
-		Movies m =  movieRepository.findById(movieId).get();
-		
-		List<Show> temp = new ArrayList<>();
-		for(Show s: m.getShows()) {
-			Show show = new Show(s.getShowId(), s.getSlotNo(), s.getFromDate(), s.getToDate());
-			temp.add(show);
-		}
-		m.setShows(temp);
-		return m;
 	}
 	
 	public MoviesDto getMovieDetailsByName(String movieName) {

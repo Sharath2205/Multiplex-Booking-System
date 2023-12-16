@@ -19,7 +19,7 @@ public class HallCapacity {
 	@JsonIgnore
 	private HallCapacityId hallCapacityId;
 	
-	@ManyToOne	
+	@ManyToOne
 	@MapsId("hallId")
 	@JoinColumn(name = "hall_id")
 	@JsonIdentityReference(alwaysAsId = true)

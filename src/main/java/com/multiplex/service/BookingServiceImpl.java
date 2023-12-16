@@ -19,7 +19,6 @@ import com.multiplex.embedded.BookingDetailsId;
 import com.multiplex.entity.Booking;
 import com.multiplex.entity.BookingDetails;
 import com.multiplex.entity.Earnings;
-import com.multiplex.entity.Hall;
 import com.multiplex.entity.SeatType;
 import com.multiplex.entity.ShowAvailability;
 import com.multiplex.entity.Show;
@@ -42,7 +41,7 @@ import com.multiplex.repository.UserRepository;
 import com.multiplex.util.AppConstants;
 
 @Service
-public class BookingServiceImpl {
+public class BookingServiceImpl implements BookingService {
 	@Autowired
 	private BookingRepository bookingRepository;
 
@@ -66,6 +65,9 @@ public class BookingServiceImpl {
 
 	@Transactional
 	public UserBookingDto bookTickets(BookingDto bookingDTO) {
+		
+		System.out.println(bookingDTO);
+		
 		// Checking if the user is a registered user or not
 		User user = userRepository.findByEmailIdIgnoreCase(bookingDTO.getUserEmail())
 				.orElseThrow(() -> new UserNotFoundException(AppConstants.USER_NOT_REGISTERED));
@@ -74,42 +76,45 @@ public class BookingServiceImpl {
 		Show show = showsRepository.findById(bookingDTO.getShowId())
 				.orElseThrow(() -> new ShowNotFoundException(AppConstants.SHOW_ID_NOT_FOUND + bookingDTO.getShowId()));
 
+		// The date user want to book his show
 		LocalDate bookingDate = bookingDTO.getBookingDate();
 
 		if (bookingDate.isBefore(show.getFromDate()) || bookingDate.isAfter(show.getToDate()))
 			throw new InvalidShowException(AppConstants.NO_SHOW_RUNNING.replace("date",
 					bookingDTO.getBookingDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
 
+		// Seat types which are selected by the user
 		Map<String, Integer> selectedSeatTypeCounts = bookingDTO.getSelectedSeatType();
 
 		if (selectedSeatTypeCounts.values().stream().noneMatch(i -> i > 0))
 			throw new BookingException(AppConstants.NO_SEAT_TYPE);
 
-		return bookTickets(user, show, selectedSeatTypeCounts, bookingDate);
-	}
-
-	@Transactional
-	public UserBookingDto bookTickets(User user, Show show, Map<String, Integer> selectedSeatTypeCounts,
-			LocalDate bookingDate) {
 		Booking booking = new Booking();
 		booking.setBookedDate(LocalDateTime.now());
 		booking.setShowDate(bookingDate);
 		booking.setUser(user);
 		booking.setShows(show);
 
+		// Save the booking to get the ID
 		booking = bookingRepository.save(booking);
 		double totalCost = 0;
 
+		// Fetch all the valid seats 
 		List<SeatType> selectedSeatTypes = seatTypeRepository
 				.findAllBySeatTypeDescIgnoreCaseIn(selectedSeatTypeCounts.keySet());
 
+		// For each seat type selected by the user book the seats and decrease the available seat count
 		for (SeatType selectedSeatType : selectedSeatTypes) {
-			ShowAvailability showAvailability = getShowAvailability(show, show.getHall(), selectedSeatType,
-					bookingDate);
+			
+			// Here we are finding the seat availability chart by checking the remaining seats with show id, hall id, selected seat type, booking date which user wants
+			ShowAvailability showAvailability =  showAvailabilityRepository
+					.findByShowAndHallAndSeatTypeAndAvailabilityDate(show, show.getHall(), selectedSeatType, bookingDate)
+					.orElseThrow(() -> new ShowNotFoundException(AppConstants.NO_SHOW_AVAILABILITY));
 
 			int remainingSeats = showAvailability.getRemainingSeats();
 			int numberOfSeats = selectedSeatTypeCounts.get(selectedSeatType.getSeatTypeDesc());
 
+			// If the remaining seats are more than the required seats we book the ticket for the user
 			if (remainingSeats >= numberOfSeats) {
 				BookingDetails bookingDetails = new BookingDetails();
 				BookingDetailsId bookingDetailsId = new BookingDetailsId(booking.getBookingId(),
@@ -126,11 +131,17 @@ public class BookingServiceImpl {
 
 				totalCost += selectedSeatType.getSeatFare() * numberOfSeats;
 
-			} else {
+			} else { 
+				// As we are aborting the booking delete the booking record from the db
+				bookingDetailsRepository.deleteAll(booking.getBookingDetails());
+				bookingRepository.delete(booking);
+				
+				// If the remaining seats are less than required seats inform user if he/she wants to booking the available seats
 				if (remainingSeats > 0) {
 					throw new SeatNotAvailableException(AppConstants.ALL_SEATS_NOT_AVAILABLE.replace("#",
 							Integer.toString(remainingSeats).replace("*", selectedSeatType.getSeatTypeDesc())));
-				} else {
+				} else { 
+					// if the seats are not available send on seats available exception
 					bookingDetailsRepository.deleteAll(booking.getBookingDetails());
 					bookingRepository.delete(booking);
 					throw new SeatNotAvailableException(
@@ -139,6 +150,7 @@ public class BookingServiceImpl {
 			}
 		}
 
+		// DTO class to send user all the required booking info
 		int noOfTotalSeats = selectedSeatTypeCounts.values().stream().mapToInt(a -> a).sum();
 		earningsRepository
 				.save(new Earnings(booking.getBookingId(), "booked", totalCost, noOfTotalSeats, LocalDate.now()));
@@ -154,7 +166,7 @@ public class BookingServiceImpl {
 		userBookingDto.setBookingTotal(totalCost);
 		userBookingDto.setCancellationCharges(0D);
 		userBookingDto.setBookingStatus("Booked");
-		
+
 		return userBookingDto;
 	}
 
@@ -189,11 +201,11 @@ public class BookingServiceImpl {
 		}
 
 		// ------- INCREASING THE SEAT COUNT ------------
-		
+
 		Map<String, Integer> seatCounts = new HashMap<>();
 		double totalCost = 0;
 		double cancellationCharges = 0;
-		
+
 		Show show = canceledBooking.getShows();
 		bookingDetailsList = canceledBooking.getBookingDetails();
 
@@ -211,10 +223,10 @@ public class BookingServiceImpl {
 			seatCounts.put(seatType.getSeatTypeDesc(), canceledSeats);
 			totalCost += seatType.getSeatFare() * canceledSeats;
 			cancellationCharges += seatType.getSeatFare() * canceledSeats * 0.2;
-			
+
 			showAvailabilityRepository.save(showAvailability);
 		}
-		
+
 		UserBookingDto userBookingDto = new UserBookingDto();
 		userBookingDto.setBookingId(canceledBooking.getBookingId());
 		userBookingDto.setUserName(canceledBooking.getUser().getUserName());
@@ -227,13 +239,7 @@ public class BookingServiceImpl {
 		userBookingDto.setBookingTotal(totalCost);
 		userBookingDto.setCancellationCharges(cancellationCharges);
 		userBookingDto.setBookingStatus("cancelled");
-		
-		return userBookingDto;
-	}
 
-	private ShowAvailability getShowAvailability(Show show, Hall hall, SeatType seatType, LocalDate availabilityDate) {
-		return showAvailabilityRepository
-				.findByShowAndHallAndSeatTypeAndAvailabilityDate(show, hall, seatType, availabilityDate)
-				.orElseThrow(() -> new ShowNotFoundException(AppConstants.NO_SHOW_AVAILABILITY));
+		return userBookingDto;
 	}
 }

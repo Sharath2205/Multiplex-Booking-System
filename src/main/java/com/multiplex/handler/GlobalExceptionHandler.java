@@ -133,7 +133,7 @@ public final class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(ShowOverlapException.class)
-	public ResponseEntity<ApiError> ShowOverlapExceptionHandler(ShowOverlapException ex) {
+	public ResponseEntity<ApiError> showOverlapExceptionHandler(ShowOverlapException ex) {
 		error.setStatus(HttpStatus.BAD_REQUEST);
 		error.setMessage(ex.getMessage());
 		error.setTimestamp(LocalDateTime.now());
@@ -200,16 +200,3 @@ public final class GlobalExceptionHandler {
     	return new ResponseEntity<>(error, HttpStatus.valueOf(400));
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
