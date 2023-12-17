@@ -59,8 +59,7 @@ class ShowServiceTest {
 	private ShowsServiceImpl showsService;
 
 	@Test
-	void testAddShow_Success() {
-		// Arrange
+	void addShowTest() {
 		Hall hall = createHall("TestHall", 100);
 		Movies movie = createMovie("TestMovie", "Action");
 		PublishShowDto showDto = createPublishShowDto("TestHall", "TestMovie", 1, LocalDate.now(),
@@ -72,16 +71,13 @@ class ShowServiceTest {
 				showDto.getToDate())).thenReturn(new ArrayList<>());
 		when(showsRepository.save(any()))
 				.thenReturn(createShow(hall, movie, 2, LocalDate.of(2023, 12, 19), LocalDate.of(2023, 12, 30)));
-		// Act
 		boolean result = showsService.addShow(showDto);
 
-		// Assert
 		assertTrue(result);
 	}
 
 	@Test
 	void addShowInvalidSlotNumberExceptionFirstCaseTest() {
-		// Arrange
 		Hall hall = createHall("TestHall", 100);
 		Movies movie = createMovie("TestMovie", "Action");
 		PublishShowDto showDto = createPublishShowDto("TestHall", "TestMovie", 5, LocalDate.now(),
@@ -90,13 +86,11 @@ class ShowServiceTest {
 		when(hallRepository.findByHallDescIgnoreCase(showDto.getHallName())).thenReturn(Optional.of(hall));
 		when(movieRepository.findByMovieNameIgnoreCase(showDto.getMovieName())).thenReturn(Optional.of(movie));
 
-		// Act and Assert
 		assertThrows(InvalidSlotNumberException.class, () -> showsService.addShow(showDto));
 	}
 
 	@Test
 	void addShowInvalidSlotNumberExceptionAnotherCaseTest() {
-		// Arrange
 		Hall hall = createHall("TestHall", 100);
 		Movies movie = createMovie("TestMovie", "Action");
 		PublishShowDto showDto = createPublishShowDto("TestHall", "TestMovie", -1, LocalDate.now(),
@@ -105,13 +99,11 @@ class ShowServiceTest {
 		when(hallRepository.findByHallDescIgnoreCase(showDto.getHallName())).thenReturn(Optional.of(hall));
 		when(movieRepository.findByMovieNameIgnoreCase(showDto.getMovieName())).thenReturn(Optional.of(movie));
 
-		// Act and Assert
 		assertThrows(InvalidSlotNumberException.class, () -> showsService.addShow(showDto));
 	}
 
 	@Test
 	void addShowFailureTest() {
-		// Arrange
 		Hall hall = createHall("TestHall", 100);
 		Movies movie = createMovie("TestMovie", "Action");
 		PublishShowDto showDto = createPublishShowDto("TestHall", "TestMovie", 1, LocalDate.now(),
@@ -122,68 +114,55 @@ class ShowServiceTest {
 		when(showsRepository.findByHallAndSlotNoAndDates(hall, showDto.getSlotNo(), showDto.getFromDate(),
 				showDto.getToDate())).thenReturn(new ArrayList<>());
 
-		// Act
 		boolean result = showsService.addShow(showDto);
 
-		// Assert
 		assertFalse(result);
 	}
 
 	@Test
-	void testAddShow_UserNotFoundException() {
-		// Arrange
+	void addShowUserNotFoundExceptionTest() {
 		PublishShowDto showDto = createPublishShowDto("TestHall", "TestMovie", 1, LocalDate.now(),
 				LocalDate.now().plusDays(7));
 		when(userRepository.findById(showDto.getAdminId())).thenReturn(Optional.empty());
 
-		// Act and Assert
 		assertThrows(UserNotFoundException.class, () -> showsService.addShow(showDto));
 	}
 
-	// Add more test cases for different scenarios
 
 	@Test
-	void testDeleteShowById_Success() {
-		// Arrange
+	void deleteShowByIdTest() {
 		int showId = 1;
 		Show show = createShow(createHall("TestHall", 100), createMovie("TestMovie", "Action"), 1, LocalDate.now(),
 				LocalDate.now().plusDays(7));
 		when(showsRepository.findById(showId)).thenReturn(Optional.of(show));
 		when(showsRepository.save(show)).thenReturn(show);
 
-		// Act
 		boolean result = showsService.deleteShowById(showId);
 
-		// Assert
 		assertTrue(result);
 	}
 
 	@Test
-	void testDeleteShowById_ShowNotFoundException() {
-		// Arrange
+	void deleteShowByIdShowNotFoundExceptionTest() {
 		int showId = 1;
 		when(showsRepository.findById(showId)).thenReturn(Optional.empty());
 
-		// Act and Assert
 		assertThrows(ShowNotFoundException.class, () -> showsService.deleteShowById(showId));
 	}
 
 	@Test
-	void testDeleteShowById_ShowDeletionException() {
-		// Arrange
+	void deleteShowByIdShowDeletionExceptionTest() {
 		int showId = 1;
 		Show show = createShow(createHall("TestHall", 100), createMovie("TestMovie", "Action"), 1, LocalDate.now(),
 				LocalDate.now().plusDays(7));
 		show.getBooking().add(createBooking(show));
 		when(showsRepository.findById(showId)).thenReturn(Optional.of(show));
 
-		// Act and Assert
 		assertThrows(ShowDeletionException.class, () -> showsService.deleteShowById(showId));
 	}
 
 	@Test
-	void testGetAllShowsByMovieName_Success() {
-		// Arrange
+	void getAllShowsByMovieNameTest() {
 		String movieName = "TestMovie";
 		Movies movie = createMovie(movieName, "Action");
 		Show show = createShow(createHall("TestHall", 100), movie, 1, LocalDate.now(), LocalDate.now().plusDays(7));
@@ -193,26 +172,21 @@ class ShowServiceTest {
 		when(movieRepository.findByMovieNameIgnoreCase(movieName)).thenReturn(Optional.of(movie));
 		when(showsRepository.findByMovieName(movie.getMovieName())).thenReturn(List.of(show));
 
-		// Act
 		List<UserShowsDto> result = showsService.getAllShowsByMovieName(movieName);
 
-		// Assert
 		assertEquals(expectedShows.toString(), result.toString());
 	}
 
 	@Test
-	void testGetAllShowsByMovieName_MovieNotFoundException() {
-		// Arrange
+	void getAllShowsByMovieNameMovieNotFoundExceptionTest() {
 		String movieName = "NonExistentMovie";
 		when(movieRepository.findByMovieNameIgnoreCase(movieName)).thenReturn(Optional.empty());
 
-		// Act and Assert
 		assertThrows(MovieNotFoundException.class, () -> showsService.getAllShowsByMovieName(movieName));
 	}
 
 	@Test
-	void testAddShow_MovieNotFoundException() {
-		// Arrange
+	void addShowMovieNotFoundExceptionTest() {
 		Hall hall = createHall("TestHall", 100);
 		PublishShowDto showDto = createPublishShowDto("TestHall", "NonExistentMovie", 2, LocalDate.now(),
 				LocalDate.now().plusDays(7));
@@ -220,13 +194,11 @@ class ShowServiceTest {
 		when(hallRepository.findByHallDescIgnoreCase(showDto.getHallName())).thenReturn(Optional.of(hall));
 		when(movieRepository.findByMovieNameIgnoreCase(showDto.getMovieName())).thenReturn(Optional.empty());
 
-		// Act and Assert
 		assertThrows(MovieNotFoundException.class, () -> showsService.addShow(showDto));
 	}
 
 	@Test
-	void testAddShow_ShowOverlapException() {
-		// Arrange
+	void addShowShowOverlapExceptionTest() {
 		Hall hall = createHall("TestHall", 100);
 		Movies movie = createMovie("TestMovie", "Action");
 		Show existingShow = createShow(hall, movie, 2, LocalDate.now(), LocalDate.now().plusDays(7));
@@ -238,13 +210,11 @@ class ShowServiceTest {
 		when(showsRepository.findByHallAndSlotNoAndDates(hall, showDto.getSlotNo(), showDto.getFromDate(),
 				showDto.getToDate())).thenReturn(List.of(existingShow));
 
-		// Act and Assert
 		assertThrows(ShowOverlapException.class, () -> showsService.addShow(showDto));
 	}
 
 	@Test
-	void testAddShow_CreateShowAvailabilities() {
-		// Arrange
+	void addShowCreateShowAvailabilitiesTest() {
 		Hall hall = createHall("TestHall", 100);
 		Movies movie = createMovie("TestMovie", "Action");
 		PublishShowDto showDto = createPublishShowDto("TestHall", "TestMovie", 2, LocalDate.now(),
@@ -255,92 +225,73 @@ class ShowServiceTest {
 		when(showsRepository.findByHallAndSlotNoAndDates(hall, showDto.getSlotNo(), showDto.getFromDate(),
 				showDto.getToDate())).thenReturn(Collections.emptyList());
 
-		// Act
 		showsService.addShow(showDto);
 
-		// Assert
 		verify(showAvailabilityRepository, times(hall.getHallCapacities().size())).save(any(ShowAvailability.class));
 	}
 
 	@Test
-	void testGetAllShowsByMovieName_NoShowsForMovie() {
-		// Arrange
+	void getAllShowsByMovieNameNoShowsForMovieExceptionTest() {
 		String movieName = "NonExistentMovie";
 		when(movieRepository.findByMovieNameIgnoreCase(movieName))
 				.thenReturn(Optional.of(createMovie(movieName, "Action")));
 
-		// Act and Assert
 		assertThrows(ShowNotFoundException.class, () -> showsService.getAllShowsByMovieName(movieName));
 	}
 
 	@Test
-	void testGetShowById_ShowExists() {
-		// Arrange
+	void getShowByIdShowExistsExceptionTest() {
 		int showId = 1;
 		when(showsRepository.findById(showId)).thenReturn(Optional.of(createShow()));
 
-		// Act
 		UserShowsDto result = showsService.getShowById(showId);
 
-		// Assert
 		assertNotNull(result);
-		// Add more assertions as needed
 	}
 
 	@Test
-	void testGetShowById_ShowNotFound() {
-		// Arrange
+	void getShowByIdShowNotFoundExceptionTest() {
 		int showId = 1;
 		when(showsRepository.findById(showId)).thenReturn(Optional.empty());
 
-		// Act and Assert
 		assertThrows(ShowNotFoundException.class, () -> showsService.getShowById(showId));
 	}
 
 	@Test
-	void testGetAllBookingsByShowId_ShowExistsWithBookings() {
-		// Arrange
+	void getAllBookingsByShowIdShowExistsWithBookingsExceptionTest() {
 		int showId = 1;
 		Show show = createShow();
 		show.setBooking(new ArrayList<>());
 		show.getBooking().add(createBooking()); 
 		when(showsRepository.findById(showId)).thenReturn(Optional.of(show));
 
-		// Act
 		List<Booking> result = showsService.getAllBookingsByShowId(showId);
 
-		// Assert
 		assertNotNull(result);
 		assertFalse(result.isEmpty());
 	}
 
 	@Test
-	void testGetAllBookingsByShowId_ShowExistsNoBookings() {
-		// Arrange
+	void getAllBookingsByShowIdShowExistsNoBookingsExceptionTest() {
 		int showId = 1;
 		Show show = createShow();
 		show.setBooking(new ArrayList<>());
 		when(showsRepository.findById(showId)).thenReturn(Optional.of(show));
 
-		// Act
 		List<Booking> result = showsService.getAllBookingsByShowId(showId);
 
-		// Assert
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 	}
 
 	@Test
-	void testGetAllBookingsByShowId_ShowNotFound() {
-		// Arrange
+	void getAllBookingsByShowIdShowNotFoundExceptionTest() {
 		int showId = 1;
 		when(showsRepository.findById(showId)).thenReturn(Optional.empty());
 
-		// Act and Assert
 		assertThrows(ShowNotFoundException.class, () -> showsService.getAllBookingsByShowId(showId));
 	}
 
-	// Utility method to create test data
 	private Hall createHall(String hallDesc, int totalCapacity) {
 		Hall hall = new Hall();
 		hall.setHallDesc(hallDesc);
@@ -399,7 +350,6 @@ class ShowServiceTest {
 		Hall hall = new Hall();
 		hall.setHallId(1);
 		hall.setHallDesc("TestHall");
-		// Set other relevant properties for the Hall
 		return hall;
 	}
 
@@ -410,7 +360,7 @@ class ShowServiceTest {
 
 		show.setHall(hall);
 		show.setMovie(movie);
-		show.setSlotNo(1); // Assume a valid slot number
+		show.setSlotNo(1); 
 		show.setFromDate(LocalDate.now());
 		show.setToDate(LocalDate.now().plusDays(7));
 
@@ -421,7 +371,6 @@ class ShowServiceTest {
 		Movies movie = new Movies();
 		movie.setMovieName("TestMovie");
 		movie.setGenre("Action");
-		// Set other relevant properties
 		return movie;
 	}
 
@@ -440,14 +389,6 @@ class ShowServiceTest {
 	private User createUser() {
 		User user = new User();
 		user.setUserName("TestUser");
-		// Set other relevant properties
 		return user;
 	}
-
-//	private SeatType createSeatType() {
-//		SeatType seatType = new SeatType();
-//		seatType.setSeatTypeDesc("Regular");
-//		// Set other relevant properties
-//		return seatType;
-//	}
 }

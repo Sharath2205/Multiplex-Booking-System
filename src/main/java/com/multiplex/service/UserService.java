@@ -2,6 +2,7 @@ package com.multiplex.service;
 
 import java.util.List;
 
+import com.multiplex.dto.UserDashboardDto;
 import com.multiplex.dto.UserDto;
 import com.multiplex.dto.UserLoginDto;
 import com.multiplex.dto.UserPasswordResetDto;
@@ -21,4 +22,6 @@ public interface UserService {
 	String resetPassword(UserPasswordResetDto user);
 
 	UserProfileDto updateUser(UserProfileDto user);
+	
+	UserDashboardDto userDashboard(String emailId);
 }

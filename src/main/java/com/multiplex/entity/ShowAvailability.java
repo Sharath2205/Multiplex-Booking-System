@@ -46,6 +46,22 @@ public class ShowAvailability {
 	public ShowAvailability() {
 		super();
 	}
+	
+	
+
+	public ShowAvailability(int availabilityId, Show show, Hall hall, SeatType seatType, LocalDate availabilityDate,
+			int totalSeats, int remainingSeats) {
+		super();
+		this.availabilityId = availabilityId;
+		this.show = show;
+		this.hall = hall;
+		this.seatType = seatType;
+		this.availabilityDate = availabilityDate;
+		this.totalSeats = totalSeats;
+		this.remainingSeats = remainingSeats;
+	}
+
+
 
 	public int getAvailabilityId() {
 		return availabilityId;

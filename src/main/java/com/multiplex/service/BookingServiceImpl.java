@@ -77,7 +77,7 @@ public class BookingServiceImpl implements BookingService {
 		// The date user want to book his show
 		LocalDate bookingDate = bookingDTO.getBookingDate();
 
-		if (bookingDate.isBefore(show.getFromDate()) || bookingDate.isAfter(show.getToDate()))
+		if (show.getFromDate() == null || bookingDate.isBefore(show.getFromDate()) || bookingDate.isAfter(show.getToDate()))
 			throw new InvalidShowException(AppConstants.NO_SHOW_RUNNING.replace("date",
 					bookingDTO.getBookingDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
 
@@ -166,24 +166,24 @@ public class BookingServiceImpl implements BookingService {
 
 	@Transactional
 	public UserBookingDto cancelBooking(CancelDto cancelDto) {
-		Booking canceledBooking = bookingRepository.findById(cancelDto.getBookingId()).orElseThrow(
+		Booking viewBooking = bookingRepository.findById(cancelDto.getBookingId()).orElseThrow(
 				() -> new BookingNotFoundException(AppConstants.BOOKING_NOT_FOUND_WITH_ID + cancelDto.getBookingId()));
 
-		if (!canceledBooking.getUser().getEmailId().equalsIgnoreCase(cancelDto.getUserEmail())) {
+		if (!viewBooking.getUser().getEmailId().equalsIgnoreCase(cancelDto.getUserEmail())) {
 			throw new InvalidUserException(AppConstants.NOT_VALID_USER);
 		}
 
-		LocalDate showDate = canceledBooking.getShowDate();
+		LocalDate showDate = viewBooking.getShowDate();
 		LocalDate currentDate = LocalDate.now();
 		if (showDate.isBefore(currentDate.plusDays(2))) {
 			throw new CancelBookingException("Cannot cancel booking within 2 days of the show");
 		}
 
-		List<BookingDetails> bookingDetailsList = bookingDetailsRepository.findByBooking(canceledBooking);
+		List<BookingDetails> bookingDetailsList = bookingDetailsRepository.findByBooking(viewBooking);
 
 		bookingDetailsRepository.deleteAll(bookingDetailsList);
 
-		bookingRepository.delete(canceledBooking);
+		bookingRepository.delete(viewBooking);
 
 		Optional<Earnings> opBookingEarnings = earningsRepository.findByBookingId(cancelDto.getBookingId());
 		if (opBookingEarnings.isPresent()) {
@@ -193,22 +193,22 @@ public class BookingServiceImpl implements BookingService {
 		} else {
 			throw new CancelBookingException("An error occured. Please try again!");
 		}
-
+		
 		// ------- INCREASING THE SEAT COUNT ------------
 
 		Map<String, Integer> seatCounts = new HashMap<>();
 		double totalCost = 0;
 		double cancellationCharges = 0;
 
-		Show show = canceledBooking.getShows();
-		bookingDetailsList = canceledBooking.getBookingDetails();
+		Show show = viewBooking.getShows();
+		bookingDetailsList = viewBooking.getBookingDetails();
 
 		for (BookingDetails bookingDetails : bookingDetailsList) {
 			SeatType seatType = bookingDetails.getSeatType();
 
 			ShowAvailability showAvailability = showAvailabilityRepository
 					.findByShowAndHallAndSeatTypeAndAvailabilityDate(show, show.getHall(), seatType,
-							canceledBooking.getShowDate())
+							viewBooking.getShowDate())
 					.orElseThrow(() -> new ShowNotFoundException(AppConstants.NO_SHOW_AVAILABILITY));
 			int remainingSeats = showAvailability.getRemainingSeats();
 			int canceledSeats = bookingDetails.getNoOfSeats();
@@ -222,18 +222,57 @@ public class BookingServiceImpl implements BookingService {
 		}
 
 		UserBookingDto userBookingDto = new UserBookingDto();
-		userBookingDto.setBookingId(canceledBooking.getBookingId());
-		userBookingDto.setUserName(canceledBooking.getUser().getUserName());
-		userBookingDto.setMovieName(canceledBooking.getMovieName());
+		userBookingDto.setBookingId(viewBooking.getBookingId());
+		userBookingDto.setUserName(viewBooking.getUser().getUserName());
+		userBookingDto.setMovieName(viewBooking.getMovieName());
 		userBookingDto.setBookingDate(LocalDate.now().toString());
-		userBookingDto.setHallDesc(canceledBooking.getHallDesc());
-		userBookingDto.setSlotNo(canceledBooking.getSlotNo());
+		userBookingDto.setHallDesc(viewBooking.getHallDesc());
+		userBookingDto.setSlotNo(viewBooking.getSlotNo());
 		userBookingDto.setSelectedSeats(seatCounts);
-		userBookingDto.setShowDate(canceledBooking.getShowDate());
+		userBookingDto.setShowDate(viewBooking.getShowDate());
 		userBookingDto.setBookingTotal(totalCost);
 		userBookingDto.setCancellationCharges(cancellationCharges);
 		userBookingDto.setBookingStatus("cancelled");
 
+		return userBookingDto;
+	}
+	
+	public UserBookingDto getBookingByBookingId(int bookingId, String email) {
+		Booking viewBooking = bookingRepository.findById(bookingId).orElseThrow(
+				() -> new BookingNotFoundException(AppConstants.BOOKING_NOT_FOUND_WITH_ID + bookingId));
+
+		if (!viewBooking.getUser().getEmailId().equalsIgnoreCase(email)) {
+			throw new InvalidUserException(AppConstants.NOT_VALID_USER);
+		}
+		
+		Map<String, Integer> seatCounts = new HashMap<>();
+		double totalCost = 0;
+
+		List<BookingDetails> bookingDetailsList = viewBooking.getBookingDetails();
+
+		
+		for (BookingDetails bookingDetails : bookingDetailsList) {
+			SeatType seatType = bookingDetails.getSeatType();
+
+			int canceledSeats = bookingDetails.getNoOfSeats();
+			
+			seatCounts.put(seatType.getSeatTypeDesc(), canceledSeats);
+			totalCost += seatType.getSeatFare() * canceledSeats;
+		}
+		
+		UserBookingDto userBookingDto = new UserBookingDto();
+		userBookingDto.setBookingId(viewBooking.getBookingId());
+		userBookingDto.setUserName(viewBooking.getUser().getUserName());
+		userBookingDto.setMovieName(viewBooking.getMovieName());
+		userBookingDto.setBookingDate(LocalDate.now().toString());
+		userBookingDto.setHallDesc(viewBooking.getHallDesc());
+		userBookingDto.setSlotNo(viewBooking.getSlotNo());
+		userBookingDto.setSelectedSeats(seatCounts);
+		userBookingDto.setShowDate(viewBooking.getShowDate());
+		userBookingDto.setBookingTotal(totalCost);
+		userBookingDto.setCancellationCharges(0.0d);
+		userBookingDto.setBookingStatus("booked");
+		
 		return userBookingDto;
 	}
 }

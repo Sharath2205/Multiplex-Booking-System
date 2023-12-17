@@ -1,6 +1,7 @@
 package com.multiplex.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,10 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.multiplex.dto.UserBookingDto;
+import com.multiplex.dto.UserDashboardDto;
 import com.multiplex.dto.UserDto;
 import com.multiplex.dto.UserLoginDto;
 import com.multiplex.dto.UserPasswordResetDto;
 import com.multiplex.dto.UserProfileDto;
+import com.multiplex.dto.UserShowsDto;
+import com.multiplex.entity.Booking;
+import com.multiplex.entity.Show;
 import com.multiplex.entity.User;
 import com.multiplex.exception.InsufficentInformationException;
 import com.multiplex.exception.InvalidDateOfBirthException;
@@ -21,6 +27,8 @@ import com.multiplex.exception.PasswordMismatchException;
 import com.multiplex.exception.SameOldAndNewPasswordException;
 import com.multiplex.exception.UserCreationException;
 import com.multiplex.exception.UserNotFoundException;
+import com.multiplex.repository.BookingRepository;
+import com.multiplex.repository.ShowsRepository;
 import com.multiplex.repository.UserRepository;
 import com.multiplex.util.AppConstants;
 
@@ -28,6 +36,15 @@ import com.multiplex.util.AppConstants;
 public class UserServiceImpl implements UserService {
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	ShowsRepository showsRepository;
+	
+	@Autowired
+	BookingRepository bookingRepository;
+	
+	@Autowired
+	BookingService bookingService;
 
 	@Transactional(readOnly = false)
 	public UserDto registerUser(UserDto userDto) {
@@ -132,7 +149,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(readOnly = false)
 	public String deleteUser(UserLoginDto userDto) {
 		if (userDto.getEmailId() != null && userDto.getPassword() != null) {
-			Optional<User> optionalUser = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId().toLowerCase());
+			Optional<User> optionalUser = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId());
 			if (optionalUser.isPresent()) {
 				if (userDto.getPassword().equals(optionalUser.get().getPassword())) {
 					userRepository.deleteById(optionalUser.get().getUserId());
@@ -180,5 +197,61 @@ public class UserServiceImpl implements UserService {
 			throw new UserNotFoundException(AppConstants.USER_NOT_FOUND.replace("#", user.getEmailId()));
 		}
 		throw new InsufficentInformationException(AppConstants.INSUFFICENT_INFORMATION);
+	}
+	
+	@Override
+	public UserDashboardDto userDashboard(String emailId) {
+		Optional<User> optionalUser = userRepository.findByEmailIdIgnoreCase(emailId);
+
+		if (optionalUser.isPresent()) {
+			User user = optionalUser.get();
+			
+			UserDashboardDto dashboardDto = new UserDashboardDto();
+			dashboardDto.setEmail(emailId);
+			dashboardDto.setName(user.getUserName());
+			dashboardDto.setMobileNumber(user.getMobileNumber());
+			
+			List<Show> allShows = showsRepository.findAll();
+			
+			allShows = allShows.stream().filter(a -> a.getToDate().isBefore(LocalDate.now())).limit(3).toList();
+			
+			List<UserShowsDto> latestShows = new ArrayList<>();
+			for(Show show: allShows) {
+				UserShowsDto userShowsDto = new UserShowsDto();
+				userShowsDto.setMovieName(show.getMovie().getMovieName());
+				userShowsDto.setHallDesc(show.getHall().getHallDesc());
+				userShowsDto.setSlotNo(show.getSlotNo());
+				userShowsDto.setFromDate(show.getFromDate());
+				userShowsDto.setToDate(show.getToDate());
+				
+				latestShows.add(userShowsDto);
+			}
+			
+			List<Booking> allBookings = bookingRepository.findAllByUser(user);
+			
+			List<UserBookingDto> upcomingBookings = new ArrayList<>();
+			List<UserBookingDto> pastBookings = new ArrayList<>();
+			
+			for(Booking booking: allBookings) {
+				UserBookingDto userBookingDto = bookingService.getBookingByBookingId(booking.getBookingId(), user.getEmailId());
+				
+				if(userBookingDto.getShowDate().isBefore(LocalDate.now())) {
+					pastBookings.add(userBookingDto);
+				} else {
+					upcomingBookings.add(userBookingDto);
+				}
+			}
+			
+			dashboardDto.setLatestShows(latestShows);
+			dashboardDto.setPastBookings(pastBookings);
+			dashboardDto.setUpcomingBookings(upcomingBookings);
+			dashboardDto.setSearchMovies("http://localhost:8090/api/v1/movies/");
+			dashboardDto.setUpdateProfile("http://localhost:8090/api/v1/user/editprofile");
+			dashboardDto.setBookTicket("http://localhost:8090/api/v1/user/bookticket");
+			dashboardDto.setCancelBooking("http://localhost:8090/api/v1/user/cancelbooking");
+			return dashboardDto;
+		} else {
+	        throw new InvalidEmailException(AppConstants.USER_NOT_FOUND);
+	    }
 	}
 }

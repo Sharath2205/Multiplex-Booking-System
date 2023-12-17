@@ -15,7 +15,7 @@ public class AppConstants {
 	public static final String INVALID_EMAIL = "Invalid email. Example: user.email@example.com.";
 	public static final String INVALID_MOBILE_NUMBER = "Enter a valid 10 digit mobile number.";
 	public static final String INVALID_CREDENTIALS = "Invalid email or password. Please double-check your credentials and try again";
-	public static final String USER_NOT_FOUND = "User with email # not found";
+	public static final String USER_NOT_FOUND = "User with email not found";
 	public static final String USER_NOT_REGISTERED = "Please register yourself to book tickets";
 	public static final String USER_NAME_NOT_FOUND = "User with user name \"#\" not found";
 	public static final String SAME_OLD_AND_NEW_PASSWORD = "Old password and new password should not be same";
@@ -37,8 +37,7 @@ public class AppConstants {
 	public static final String NO_SHOW_RUNNING = "Show is not available on the selected Date: date";
 	public static final String NO_SHOW_AVAILABILITY = "No availability found for the specified show, hall, seat type, and date";
 	public static final String SHOW_DELECTION_ERROR = "Unable to delete show. Please cancel all the bookings before deleting the show";
-	
-	
+
 	
 	// ---------------- HALL EXCEPTION MESSAGES ------------------
 	public static final String HALL_DESC_NOT_FOUND = "Please provide a valid Hall Name";
@@ -51,7 +50,7 @@ public class AppConstants {
 	public static final String NO_SEAT_TYPE = "Please select any seat to book a ticket";
 	public static final String INSUFFICIENT_SEATS_FOR_SEAT_TYPE = "Insufficient seats available for seat type: ";
 	public static final String BOOKING_NOT_FOUND_WITH_ID = "Booking not found with ID: ";
-	public static final String NOT_VALID_USER = "User does not have permission to cancel this booking";
+	public static final String NOT_VALID_USER = "User does not have permission to this booking";
 	public static final String ALL_SEATS_NOT_AVAILABLE = "Only # seats remaining";
 	
 	

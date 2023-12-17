@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.multiplex.dto.BookingDto;
 import com.multiplex.dto.PublishShowDto;
-import com.multiplex.dto.UserBookingDto;
 import com.multiplex.dto.UserShowsDto;
 import com.multiplex.entity.Booking;
 import com.multiplex.entity.Hall;

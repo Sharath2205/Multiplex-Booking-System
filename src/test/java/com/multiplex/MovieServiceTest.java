@@ -31,17 +31,12 @@ class MovieServiceTest {
 
     @Test
     void getMovieDetailsByNameSuccess() {
-        // Arrange
         Movies movie = createTestMovie();
-        Hall hall = createTestHall();
-        Show show = createTestShow(movie, hall);
 
         when(movieRepository.findByMovieNameIgnoreCase("TestMovie")).thenReturn(Optional.of(movie));
 
-        // Act
         MoviesDto result = movieService.getMovieDetailsByName("TestMovie");
 
-        // Assert
         assertNotNull(result);
         assertEquals(1, result.getShows().size());
         assertEquals("TestMovie", result.getMovieName());
@@ -50,14 +45,11 @@ class MovieServiceTest {
 
     @Test
     void testGetMovieDetailsByName_Success_NoShows() {
-        // Arrange
         Movies movie = createTestMovie();
         when(movieRepository.findByMovieNameIgnoreCase("TestMovie")).thenReturn(Optional.of(movie));
 
-        // Act
         MoviesDto result = movieService.getMovieDetailsByName("TestMovie");
 
-        // Assert
         assertNotNull(result);
         assertEquals(1, result.getShows().size());
         assertEquals("TestMovie", result.getMovieName());
@@ -65,10 +57,8 @@ class MovieServiceTest {
 
     @Test
     void testGetMovieDetailsByName_Failure_MovieNotFound() {
-        // Arrange
         when(movieRepository.findByMovieNameIgnoreCase("NonExistentMovie")).thenReturn(Optional.empty());
 
-        // Act and Assert
         assertThrows(MovieNotFoundException.class, () -> movieService.getMovieDetailsByName("NonExistentMovie"));
     }
     
@@ -83,7 +73,6 @@ class MovieServiceTest {
     
     @Test
     void testGetByMovieId_Success() {
-        // Arrange
         Movies expectedMovie = new Movies();
         expectedMovie.setMovieId(1);
         expectedMovie.setMovieName("TestMovie");
@@ -91,24 +80,19 @@ class MovieServiceTest {
 
         when(movieRepository.findById(1)).thenReturn(Optional.of(expectedMovie));
 
-        // Act
         Movies result = movieService.getByMovieId(1);
 
-        // Assert
         assertNotNull(result);
         assertEquals(expectedMovie, result);
     }
 
     @Test
     void testGetByMovieId_MovieNotFound() {
-        // Arrange
         when(movieRepository.findById(1)).thenReturn(Optional.empty());
 
-        // Act and Assert
         assertThrows(MovieNotFoundException.class, () -> movieService.getByMovieId(1));
     }
 
-    // Utility methods for creating test entities
     private Movies createTestMovie() {
         Movies movie = new Movies();
         movie.setMovieId(1);
