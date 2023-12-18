@@ -86,7 +86,7 @@ public class AdminController {
     	return new ResponseEntity<>(movieService.addMovie(publishMovieDto),HttpStatus.OK);
     }
     
-    @GetMapping("/earningreport")
+    @PostMapping("/earningreport")
     public ResponseEntity<EarningsOutputDto> generateEarningsReport(@RequestBody EarningsInputDto earningsInputDto) {
     	return new ResponseEntity<>(earningsService.generateEarningsReport(earningsInputDto),HttpStatus.OK);
     }

@@ -12,6 +12,7 @@ import com.multiplex.dto.PublishMovieDto;
 import com.multiplex.dto.UserShowsDto;
 import com.multiplex.entity.Movies;
 import com.multiplex.entity.Show;
+import com.multiplex.exception.MovieException;
 import com.multiplex.exception.MovieNotFoundException;
 import com.multiplex.repository.MovieRepository;
 import com.multiplex.util.AppConstants;
@@ -23,10 +24,15 @@ public class MovieServiceImpl implements MovieService {
 	MovieRepository movieRepository;
 
 	public String addMovie(PublishMovieDto movieDto) {
+		Optional<Movies> opMovie = movieRepository.findByMovieNameIgnoreCase(movieDto.getMovieName());
+		if(opMovie.isPresent()) {
+			throw new MovieException(AppConstants.MOVIE_ALREADY_EXISTS);
+		}
+		
 		Movies movie = new Movies();
 		movie.setMovieName(movieDto.getMovieName());
 		movie.setGenre(movieDto.getGenre());
-		movie = movieRepository.save(movie);
+		movieRepository.save(movie);
 		return "Movie added successfully";
 	}
 

@@ -110,7 +110,7 @@ public class ShowsServiceImpl implements ShowsService {
 			
 			Show show = opShow.get();
 			
-			if(show.getBooking() != null && show.getBooking().size() != 0) {
+			if(show.getBooking() != null && !show.getBooking().isEmpty()) {
 				throw new ShowDeletionException(AppConstants.SHOW_DELECTION_ERROR);
 			}
 			

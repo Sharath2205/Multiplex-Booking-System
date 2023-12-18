@@ -53,7 +53,6 @@ public class UserServiceImpl implements UserService {
 		if (optionalUser.isPresent()) {
 			throw new UserCreationException(AppConstants.USER_ALREADY_EXISTS);
 		} else {
-
 			if (userDto.getUserName() == null || !userDto.getUserName().matches(AppConstants.USER_NAME_REGEX)) {
 				throw new UserCreationException(AppConstants.INVALID_USER_NAME);
 			}
@@ -72,6 +71,7 @@ public class UserServiceImpl implements UserService {
 				throw new InvalidDateOfBirthException(AppConstants.INVALID_DATE_OF_BIRTH);
 			}
 		}
+		
 		User user = new User();
 		user.setUserName(userDto.getUserName());
 		user.setEmailId(userDto.getEmailId());
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(readOnly = false)
 	public String resetPassword(UserPasswordResetDto userDto) {
 	    if (userDto.getEmailId() != null) {
-	        Optional<User> user = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId().toLowerCase());
+	        Optional<User> user = userRepository.findByEmailIdIgnoreCase(userDto.getEmailId());
 	        if (user.isPresent()) {
 	            User dbUser = user.get();
 	            if (userDto.getPassword() != null && userDto.getConfirmPassword() != null) {
@@ -134,17 +134,6 @@ public class UserServiceImpl implements UserService {
 	public List<User> getAllUsers() {
 		return userRepository.findAll();
 	}
-
-//	@Transactional(readOnly = true)
-//	public User getUserByName(String name) {
-//		if (name == null) {
-//			Optional<User> optionalUser = userRepository.findByUserName(name);
-//			if (optionalUser.isPresent())
-//				return optionalUser.get();
-//			throw new UserNotFoundException(AppConstants.USER_NAME_NOT_FOUND.replace("#", name));
-//		}
-//		throw new InsufficentInformationException(AppConstants.INSUFFICENT_INFORMATION);
-//	}
 
 	@Transactional(readOnly = false)
 	public String deleteUser(UserLoginDto userDto) {
@@ -181,7 +170,7 @@ public class UserServiceImpl implements UserService {
 					dbUser.setMobileNumber(user.getMobileNumber());
 				} else if (user.getMobileNumber() != 0
 						&& !Long.toString(user.getMobileNumber()).matches(AppConstants.MOBILE_NUMBER_REGEX)) {
-					throw new UserCreationException(AppConstants.INVALID_MOBILE_NUMBER);
+					throw new InvalidPasswordException(AppConstants.INVALID_MOBILE_NUMBER);
 				}
 
 				dbUser = userRepository.save(dbUser);

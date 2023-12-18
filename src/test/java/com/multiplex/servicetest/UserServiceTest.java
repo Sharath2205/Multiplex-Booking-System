@@ -7,8 +7,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -16,10 +20,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.multiplex.dto.UserBookingDto;
+import com.multiplex.dto.UserDashboardDto;
 import com.multiplex.dto.UserDto;
 import com.multiplex.dto.UserLoginDto;
 import com.multiplex.dto.UserPasswordResetDto;
 import com.multiplex.dto.UserProfileDto;
+import com.multiplex.entity.Booking;
+import com.multiplex.entity.Hall;
+import com.multiplex.entity.Movies;
+import com.multiplex.entity.Show;
 import com.multiplex.entity.User;
 import com.multiplex.exception.InsufficentInformationException;
 import com.multiplex.exception.InvalidDateOfBirthException;
@@ -29,13 +39,26 @@ import com.multiplex.exception.PasswordMismatchException;
 import com.multiplex.exception.SameOldAndNewPasswordException;
 import com.multiplex.exception.UserCreationException;
 import com.multiplex.exception.UserNotFoundException;
+import com.multiplex.repository.BookingRepository;
+import com.multiplex.repository.ShowsRepository;
 import com.multiplex.repository.UserRepository;
+import com.multiplex.service.BookingService;
+import com.multiplex.service.BookingServiceImpl;
 import com.multiplex.service.UserServiceImpl;
 
 @SpringBootTest
 class UserServiceTest {
 	@Mock
 	private UserRepository userRepository;
+	
+	@Mock
+	private ShowsRepository showsRepository;
+	
+	@Mock
+	private BookingRepository bookingRepository;
+	
+	@Mock
+	private BookingServiceImpl bookingService;
 
 	@InjectMocks
 	private UserServiceImpl userService;
@@ -118,7 +141,7 @@ class UserServiceTest {
 		UserProfileDto userProfileDto = createUserProfileDto();
 		userProfileDto.setMobileNumber(123);
 		when(userRepository.findByEmailIdIgnoreCase(any())).thenReturn(Optional.of(createUser()));
-		assertThrows(UserCreationException.class, () -> userService.updateUser(userProfileDto));
+		assertThrows(InvalidPasswordException.class, () -> userService.updateUser(userProfileDto));
 	}
 
 	@Test
@@ -307,7 +330,7 @@ class UserServiceTest {
 		userDto.setMobileNumber(123); // Invalid mobile number
 		when(userRepository.findByEmailIdIgnoreCase(any())).thenReturn(Optional.ofNullable(createUser()));
 		
-		assertThrows(UserCreationException.class, () -> userService.updateUser(userDto));
+		assertThrows(InvalidPasswordException.class, () -> userService.updateUser(userDto));
 	}
 
 	@Test
@@ -343,6 +366,63 @@ class UserServiceTest {
         assertEquals(2, result.size());
         assertEquals(userList, result);
     }
+	
+	@Test
+	void userDashboardSuccessTest() {
+	    String emailId = "testinguser@example.com";
+	    User user = createUser();
+	    when(userRepository.findByEmailIdIgnoreCase(emailId)).thenReturn(Optional.of(user));
+
+	    List<Show> allShows = Arrays.asList(createShow(), createShow());
+	    when(showsRepository.findAll()).thenReturn(allShows);
+
+	    List<Booking> allBookings = Arrays.asList(createBooking(), createBooking());
+	    when(bookingRepository.findAllByUser(user)).thenReturn(allBookings);
+	    when(bookingService.getBookingByBookingId(user.getUserId(), user.getEmailId())).thenReturn(createSampleUserBookingDto());
+	    
+	    UserDashboardDto result = userService.userDashboard(emailId);
+
+	    assertNotNull(result);
+	    assertEquals(emailId, result.getEmail());
+	    assertEquals(user.getUserName(), result.getName());
+	    assertEquals(user.getMobileNumber(), result.getMobileNumber());
+	}
+
+	@Test
+	void userDashboardUserNotFoundExceptionTest() {
+	    // Arrange
+	    String emailId = "nonexistentuser@example.com";
+	    when(userRepository.findByEmailIdIgnoreCase(emailId)).thenReturn(Optional.empty());
+
+	    // Act & Assert
+	    assertThrows(InvalidEmailException.class, () -> userService.userDashboard(emailId));
+	}
+	
+	@Test
+	void userDashboardInvalidEmailExceptionTest() {
+	    // Act & Assert
+	    assertThrows(InvalidEmailException.class, () -> userService.userDashboard(null));
+	    assertThrows(InvalidEmailException.class, () -> userService.userDashboard(""));
+	}
+
+	@Test
+	void userDashboardPastShowDateTest() {
+	    // Arrange
+	    String emailId = "testinguser@example.com";
+	    User user = createUser();
+	    when(userRepository.findByEmailIdIgnoreCase(emailId)).thenReturn(Optional.of(user));
+
+	    List<Show> allShows = Collections.singletonList(createPastShow());
+	    when(showsRepository.findAll()).thenReturn(allShows);
+
+	    // Act
+	    UserDashboardDto result = userService.userDashboard(emailId);
+
+	    // Assert
+	    assertNotNull(result);
+	    assertEquals(0, result.getLatestShows().size()); // No past shows should be included
+	}
+
 
 	// helper methods to create user and userdto obj
 
@@ -391,4 +471,74 @@ class UserServiceTest {
 		resetDto.setConfirmPassword("NewPassword123");
 		return resetDto;
 	}
+	
+	private Show createShow() {
+	    Show show = new Show();
+	    show.setMovie(createMovie());
+	    show.setHall(createHall());
+	    show.setSlotNo(1);
+	    show.setFromDate(LocalDate.now().plusDays(1));
+	    show.setToDate(LocalDate.now().plusDays(3));
+	    return show;
+	}
+
+	// Helper method to create a past Show object
+	private Show createPastShow() {
+	    Show show = new Show();
+	    show.setMovie(createMovie());
+	    show.setHall(createHall());
+	    show.setSlotNo(1);
+	    show.setFromDate(LocalDate.now().minusDays(3));
+	    show.setToDate(LocalDate.now().minusDays(1));
+	    return show;
+	}
+
+	// Helper method to create a Booking object
+	private Booking createBooking() {
+	    Booking booking = new Booking();
+	    booking.setBookingId(1);
+	    booking.setUser(createUser());
+	    booking.setShows(createShow());
+	    booking.setBookedDate(LocalDateTime.now());
+	    // Add more properties as needed
+	    return booking;
+	}
+
+	// Helper method to create a Movie object
+	private Movies createMovie() {
+	    Movies movie = new Movies();
+	    movie.setMovieName("Test Movie");
+	    // Add more properties as needed
+	    return movie;
+	}
+
+	// Helper method to create a Hall object
+	private Hall createHall() {
+	    Hall hall = new Hall();
+	    hall.setHallDesc("Hall A");
+	    // Add more properties as needed
+	    return hall;
+	}
+	private UserBookingDto createSampleUserBookingDto() {
+        UserBookingDto userBookingDto = new UserBookingDto();
+        userBookingDto.setBookingId(1);
+        userBookingDto.setUserName("John Doe");
+        userBookingDto.setMovieName("Sample Movie");
+        userBookingDto.setBookingDate(LocalDate.now().toString());
+        userBookingDto.setHallDesc("Hall A");
+        userBookingDto.setSlotNo(1);
+
+        // Create a sample map of selected seats
+        Map<String, Integer> selectedSeats = new HashMap<>();
+        selectedSeats.put("VIP", 2);
+        selectedSeats.put("Regular", 3);
+        userBookingDto.setSelectedSeats(selectedSeats);
+
+        userBookingDto.setShowDate(LocalDate.now().plusDays(1));
+        userBookingDto.setBookingTotal(150.0);
+        userBookingDto.setCancellationCharges(0.0);
+        userBookingDto.setBookingStatus("booked");
+
+        return userBookingDto;
+    }
 }

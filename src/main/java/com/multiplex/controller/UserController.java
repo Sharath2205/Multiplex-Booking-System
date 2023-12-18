@@ -78,10 +78,4 @@ public class UserController {
 	public ResponseEntity<UserDashboardDto> userDashboard(@RequestParam String email) {
 		return new ResponseEntity<>(userService.userDashboard(email), HttpStatus.OK);
 	}
-	
-	
-//	@GetMapping()
-	
-//	@GetMapping("/dashboard")
-//	public ResponseEntity<>
 }

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -440,17 +441,104 @@ class BookingServiceTest {
 		assertEquals("Sample Hall", result.getHallDesc());
 		assertEquals(1, result.getSlotNo());
 	}
-	
+
 	@Test
 	void testGetBookingByBookingIdBookingNotFound() {
 		CancelDto cancelDto = createCancelDto();
 
 		when(bookingRepository.findById(any())).thenReturn(Optional.empty());
 
-		assertThrows(BookingNotFoundException.class, () -> bookingService.getBookingByBookingId(cancelDto.getBookingId(), cancelDto.getUserEmail()));
+		assertThrows(BookingNotFoundException.class,
+				() -> bookingService.getBookingByBookingId(cancelDto.getBookingId(), cancelDto.getUserEmail()));
+	}
+
+	@Test
+	void testGetBookingByBookingId_InvalidUser() {
+		CancelDto cancelDto = createCancelDto();
+		Booking booking = createBooking(createUser(), createShow());
+		User user = createUser();
+		user.setEmailId("anotherUser@example.com");
+		booking.setUser(user);
+
+		when(bookingRepository.findById(any())).thenReturn(Optional.of(booking));
+
+		assertThrows(InvalidUserException.class,
+				() -> bookingService.getBookingByBookingId(cancelDto.getBookingId(), cancelDto.getUserEmail()));
+	}
+
+
+	@Test
+	void testGetBookingByBookingId_Success() {
+		int bookingId = 1;
+		String userEmail = "testuser@example.com";
+		Booking mockBooking = createMockBooking();
+		User mockUser = createMockUser();
+		List<BookingDetails> mockBookingDetailsList = createMockBookingDetailsList();
+		Map<String, Integer> expectedSelectedSeats = createExpectedSelectedSeats();
+		mockBooking.setBookingDetails(mockBookingDetailsList);
+
+		when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(mockBooking));
+		when(userRepository.findByEmailIdIgnoreCase(userEmail)).thenReturn(Optional.of(mockUser));
+		when(bookingDetailsRepository.findByBooking(mockBooking)).thenReturn(mockBookingDetailsList);
+		
+		
+		UserBookingDto result = bookingService.getBookingByBookingId(bookingId, userEmail);
+
+		assertEquals(mockBooking.getBookingId(), result.getBookingId());
+		assertEquals(mockUser.getUserName(), result.getUserName());
+		assertEquals(mockBooking.getShows().getMovie().getMovieName(), result.getMovieName());
+		assertEquals(LocalDate.now().toString(), result.getBookingDate());
+		assertEquals(mockBooking.getShows().getHall().getHallDesc(), result.getHallDesc());
+		assertEquals(mockBooking.getShows().getSlotNo(), result.getSlotNo());
+		assertEquals(expectedSelectedSeats, result.getSelectedSeats());
+		assertEquals(mockBooking.getShowDate(), result.getShowDate());
 	}
 
 	// Utility methods
+
+	private Booking createMockBooking() {
+		Booking booking = new Booking();
+		booking.setBookingId(1);
+		booking.setBookedDate(LocalDateTime.now());
+		booking.setShowDate(LocalDate.now());
+//		booking.getMovieName()
+
+
+		booking.setUser(createMockUser());
+		booking.setShows(createShow());
+
+		return booking;
+	}
+
+	private User createMockUser() {
+		User user = new User();
+		user.setUserId(1);
+		user.setUserName("TestUser");
+		user.setEmailId("testuser@example.com");
+		return user;
+	}
+
+	private List<BookingDetails> createMockBookingDetailsList() {
+		BookingDetails bookingDetails = new BookingDetails();
+		bookingDetails.setNoOfSeats(2);
+		bookingDetails.setSeatType(createMockSeatType());
+		BookingDetails bookingDetails2 = new BookingDetails();
+		bookingDetails2.setNoOfSeats(2);
+		bookingDetails2.setSeatType(createMockSeatType());
+		return Arrays.asList(bookingDetails, bookingDetails2);
+	}
+
+	private SeatType createMockSeatType() {
+		SeatType seatType = new SeatType();
+		seatType.setSeatTypeDesc("Regular");
+		seatType.setSeatFare(10.0f);
+		return seatType;
+	}
+
+	private Map<String, Integer> createExpectedSelectedSeats() {
+		Map<String, Integer> selectedSeats = Collections.singletonMap("Regular", 2);
+		return selectedSeats;
+	}
 
 	public User createUser() {
 		User user = new User();
@@ -467,7 +555,8 @@ class BookingServiceTest {
 		show.setFromDate(LocalDate.of(2023, 12, 10));
 		show.setToDate(LocalDate.of(2023, 12, 28));
 		show.setMovie(new Movies(1, "inception", "sci-fi"));
-
+		show.setHall(new Hall(2, "hall 1", 100));
+		
 		return show;
 	}
 

@@ -86,6 +86,7 @@ public class BookingServiceImpl implements BookingService {
 
 		if (selectedSeatTypeCounts.values().stream().noneMatch(i -> i > 0))
 			throw new BookingException(AppConstants.NO_SEAT_TYPE);
+		
 		Booking booking = new Booking();
 		booking.setBookedDate(LocalDateTime.now());
 		booking.setShowDate(bookingDate);
@@ -137,7 +138,7 @@ public class BookingServiceImpl implements BookingService {
 							Integer.toString(remainingSeats) + " " + selectedSeatType.getSeatTypeDesc()));
 				} else { 
 					// if the seats are not available send on seats available exception
-					bookingRepository.delete(booking);
+//					bookingRepository.delete(booking);
 					throw new SeatNotAvailableException(
 							AppConstants.INSUFFICIENT_SEATS_FOR_SEAT_TYPE + selectedSeatType.getSeatTypeDesc());
 				}

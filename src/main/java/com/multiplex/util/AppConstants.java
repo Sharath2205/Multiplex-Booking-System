@@ -27,6 +27,7 @@ public class AppConstants {
 	
 	// ---------------- MOVIE EXCEPTION MESSAGES -----------------
 	public static final String MOVIE_NOT_FOUND = " not found";
+	public static final String MOVIE_ALREADY_EXISTS = "Movie already exists";
 	
 	
 	// ---------------- SHOW EXCEPTION MESSAGES ------------------
