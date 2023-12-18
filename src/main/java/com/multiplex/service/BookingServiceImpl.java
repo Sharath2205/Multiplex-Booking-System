@@ -238,6 +238,7 @@ public class BookingServiceImpl implements BookingService {
 	}
 	
 	public UserBookingDto getBookingByBookingId(int bookingId, String email) {
+		
 		Booking viewBooking = bookingRepository.findById(bookingId).orElseThrow(
 				() -> new BookingNotFoundException(AppConstants.BOOKING_NOT_FOUND_WITH_ID + bookingId));
 

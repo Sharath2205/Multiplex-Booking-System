@@ -1,4 +1,4 @@
-package com.multiplex;
+package com.multiplex.servicetest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

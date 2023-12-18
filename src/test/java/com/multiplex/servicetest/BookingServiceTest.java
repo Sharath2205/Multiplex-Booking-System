@@ -1,4 +1,4 @@
-package com.multiplex;
+package com.multiplex.servicetest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -439,6 +439,15 @@ class BookingServiceTest {
 		assertEquals("Sample Movie", result.getMovieName());
 		assertEquals("Sample Hall", result.getHallDesc());
 		assertEquals(1, result.getSlotNo());
+	}
+	
+	@Test
+	void testGetBookingByBookingIdBookingNotFound() {
+		CancelDto cancelDto = createCancelDto();
+
+		when(bookingRepository.findById(any())).thenReturn(Optional.empty());
+
+		assertThrows(BookingNotFoundException.class, () -> bookingService.getBookingByBookingId(cancelDto.getBookingId(), cancelDto.getUserEmail()));
 	}
 
 	// Utility methods

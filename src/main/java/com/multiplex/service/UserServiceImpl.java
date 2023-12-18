@@ -213,7 +213,7 @@ public class UserServiceImpl implements UserService {
 			
 			List<Show> allShows = showsRepository.findAll();
 			
-			allShows = allShows.stream().filter(a -> a.getToDate().isBefore(LocalDate.now())).limit(3).toList();
+			allShows = allShows.stream().filter(a -> a.getToDate().isAfter(LocalDate.now())).limit(3).toList();
 			
 			List<UserShowsDto> latestShows = new ArrayList<>();
 			for(Show show: allShows) {
