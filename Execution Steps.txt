@@ -1,0 +1,164 @@
+Step to execute:
+
+- Register a user and change to admin in database. UPDATE users SET user_type = 'A' where user_id = 1;
+
+POST: http://localhost:8090/api/v1/user/register
+
+{
+  "userName": "admin",
+  "emailId": "admin@gmail.com",
+  "password": "admin123",
+  "confirmPassword": "admin123",
+  "dateOfBirth": "2000-01-01",
+  "mobileNumber": 9999900000
+}
+
+- Add a movie 
+
+POST: http://localhost:8090/api/v1/admin/addmovie
+
+{
+  "movieName": "string",
+  "genre": "string"
+}
+
+- Add a hall with as many seat types as required
+
+POST: http://localhost:8090/api/v1/admin/publishhall
+
+{
+  "hallDesc": "screen 1",
+  "seatTypes": [
+    {
+      "seatTypeDesc": "normal",
+      "seatFare": 150,
+      "seatCount": 100
+    }, {
+      "seatTypeDesc": "premium",
+      "seatFare": 340,
+      "seatCount": 50
+    }, {
+      "seatTypeDesc": "executive",
+      "seatFare": 500,
+      "seatCount": 20
+    } .....
+  ]
+}
+
+- Add show 
+
+POST: http://localhost:8090/api/v1/admin/publishshow
+
+{
+  "adminId": 0,
+  "movieName": "string",
+  "hallName": "string",
+  "slotNo": 0,
+  "fromDate": "2023-12-20",
+  "toDate": "2023-12-20"
+}
+
+- Query shows by show id
+
+GET: http://localhost:8090/api/v1/shows/1
+
+- Query by movie name
+
+GET: http://localhost:8090/api/v1/movies/Inception
+
+- Query by hall id
+
+GET: http://localhost:8090/api/v1/hall/id/{hallId}
+
+- Query by hall name
+
+GET: http://localhost:8090/api/v1/hall/{hallName}
+
+
+
+----- ONLY REGISTERED USERS IS ABLE TO BOOK TICKETS
+
+
+- Register a user
+
+POST: http://localhost:8090/api/v1/user/register
+
+{
+  "userName": "user",
+  "emailId": "user@gmail.com",
+  "password": "user123",
+  "confirmPassword": "user123",
+  "dateOfBirth": "2000-01-01",
+  "mobileNumber": 9999900000
+}
+
+- User Login 
+
+GET: http://localhost:8090/api/v1/user/login
+
+{
+  "emailId": "string",
+  "password": "string"
+}
+
+- Reset password 
+
+POST: http://localhost:8090/api/v1/user/resetpassword
+
+{
+  "emailId": "string",
+  "password": "string",
+  "confirmPassword": "string"
+}
+
+- Edit profile
+
+PUT: http://localhost:8090/api/v1/user/editprofile
+
+{
+  "userName": "string",
+  "emailId": "string",
+  "mobileNumber": 0,
+  "dateOfBirth": "2023-12-20"
+}
+
+- User dashboard 
+
+GET: http://localhost:8090/api/v1/user/dashboard?email=user@gmail.com
+
+- Booking 
+
+POST: http://localhost:8090/api/v1/user/bookticket
+
+{
+  "userEmail": "string",
+  "showId": 0,
+  "bookingDate": "2023-12-20",
+  "selectedSeatType": {
+    "normal": 2,
+    "premium": 3,
+    "executive": 1
+  }
+}
+
+- Cancel booking
+
+POST: http://localhost:8090/api/v1/user/cancelbooking
+
+{
+  "userEmail": "string",
+  "bookingId": 0
+}
+
+- View Booking
+
+GET: http://localhost:8090/api/v1/user/viewbooking?bookingId=2&email=user@gmail.com
+
+- Delete user
+
+DELETE: http://localhost:8090/api/v1/user/deleteaccount
+
+{
+  "emailId": "user@gmail.com",
+  "password": "user123"
+}
